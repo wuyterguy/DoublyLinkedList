@@ -115,29 +115,15 @@ int main() {
 
     ListAddHead(dllst_1, 3);
     ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
+    ListAddTail(dllst_1, 3);
     ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
-    ListDelIndex(dllst_1, 3);
-    ListDump(dllst_1);
+
     ListDelHead(dllst_1);
     ListDump(dllst_1);
     ListDelHead(dllst_1);
     ListDump(dllst_1);
-    ListAddHead(dllst_1, 7);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 7);
-    ListDump(dllst_1);
-    ListAddHead(dllst_1, 7);
+
+    ListAddTail(dllst_1, 7);
     ListDump(dllst_1);
 
     ListDestroy(dllst_1);
@@ -328,48 +314,14 @@ void ListDump(Doubly_linked_list_t* dl_list) {
 List_report_t ListAddHead(Doubly_linked_list_t* dl_list, List_type_t value) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    size_t new_index = GetFreeIndex(dl_list);
-    if (dl_list->last_function_success != SUCCESS)
-        return dl_list->last_function_success;
-
-    dl_list->data[new_index].value = value;
-    dl_list->data[new_index].next_index = 0;
-    dl_list->data[new_index].prev_index = HEAD_INDEX;
-
-    dl_list->data[HEAD_INDEX].next_index = new_index;
-    HEAD_INDEX = new_index;
-
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    return dl_list->last_function_success = SUCCESS;
+    return ListAddIndex(dl_list, HEAD_INDEX, value);
 }
 
 
 List_report_t ListAddTail(Doubly_linked_list_t* dl_list, List_type_t value) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    size_t new_index = GetFreeIndex(dl_list);
-    if (dl_list->last_function_success != SUCCESS)
-        return dl_list->last_function_success;
-
-    dl_list->data[new_index].value = value;
-    dl_list->data[new_index].next_index = TAIL_INDEX;
-    dl_list->data[new_index].prev_index = 0;
-
-    dl_list->data[TAIL_INDEX].prev_index = new_index;
-    TAIL_INDEX = new_index;
-
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    return dl_list->last_function_success = SUCCESS;
+    return ListAddIndex(dl_list, 0, value);
 }
 
 
@@ -379,7 +331,7 @@ List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_typ
     if (LIST_VERIFY(dl_list) != LIST_NORMAL)
         return dl_list->last_function_success = FATAL_ERROR;
 
-    if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index <= 0) || (index > dl_list->capacity)) {
+    if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index < 0) || (index > dl_list->capacity)) {
         printf("note from %s(), line %d: index %d is out of range or not owned by list, %s was cancelled\n",
                __func__, __LINE__, index, __func__);
         return dl_list->last_function_success = INCORRECT_INPUT;
@@ -406,52 +358,14 @@ List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_typ
 List_report_t ListDelHead(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    if (dl_list->size == 0) {
-        printf("note from %s(), line %d: list is already empty, %s was cancelled\n", __func__, __LINE__, __func__);
-        return dl_list->last_function_success = VACUUM;
-    }
-
-    size_t old_index = HEAD_INDEX;
-
-    dl_list->data[dl_list->data[HEAD_INDEX].prev_index].next_index = 0;
-    HEAD_INDEX = dl_list->data[HEAD_INDEX].prev_index;
-
-    if (PutFreeIndex(dl_list, old_index) != SUCCESS)
-        return dl_list->last_function_success;
-
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    return dl_list->last_function_success = SUCCESS;
+    return ListDelIndex(dl_list, HEAD_INDEX);
 }
 
 
 List_report_t ListDelTail(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    if (dl_list->size == 0) {
-        printf("note from %s(), line %d: list is already empty, %s was cancelled\n", __func__, __LINE__, __func__);
-        return dl_list->last_function_success = VACUUM;
-    }
-
-    size_t old_index = TAIL_INDEX;
-
-    dl_list->data[dl_list->data[TAIL_INDEX].next_index].prev_index = 0;
-    TAIL_INDEX = dl_list->data[TAIL_INDEX].next_index;
-
-    if (PutFreeIndex(dl_list, old_index) != SUCCESS)
-        return dl_list->last_function_success;
-
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
-        return dl_list->last_function_success = FATAL_ERROR;
-
-    return dl_list->last_function_success = SUCCESS;
+    return ListDelIndex(dl_list, TAIL_INDEX);
 }
 
 
