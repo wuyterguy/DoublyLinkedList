@@ -1,0 +1,632 @@
+index   0  1  2  3  4  5  
+value   67 67 67 67 67 67 
+next    0  2  3  4  5  0  
+prev    0  -1 -1 -1 -1 -1 
+status  Z  F  F  F  F  F  
+        DT FT             
+        DH                
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 67 67 67 67 67 
+next    0  2  3  4  5  0  
+prev    0  -1 -1 -1 -1 -1 
+status  Z  F  F  F  F  F  
+        DT FT             
+        DH                
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 67 67 67 67 67 
+next    0  2  3  4  5  0  
+prev    0  -1 -1 -1 -1 -1 
+status  Z  F  F  F  F  F  
+        DT FT             
+        DH                
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 67 67 67 67 67 
+next    0  2  3  4  5  0  
+prev    0  -1 -1 -1 -1 -1 
+status  Z  F  F  F  F  F  
+        DT    FT          
+        DH                
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  67 67 67 67 
+next    1  0  3  4  5  0  
+prev    1  0  -1 -1 -1 -1 
+status  Z  D  F  F  F  F  
+           DT FT          
+           DH             
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  67 67 67 67 
+next    1  0  3  4  5  0  
+prev    1  0  -1 -1 -1 -1 
+status  Z  D  F  F  F  F  
+           DT FT          
+           DH             
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  67 67 67 67 
+next    1  0  3  4  5  0  
+prev    1  0  -1 -1 -1 -1 
+status  Z  D  F  F  F  F  
+           DT FT          
+           DH             
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  67 67 67 67 
+next    1  0  3  4  5  0  
+prev    1  0  -1 -1 -1 -1 
+status  Z  D  F  F  F  F  
+           DT    FT       
+           DH             
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  4  5  0  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT    FT       
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  4  5  0  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT    FT       
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  4  5  0  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT    FT       
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  4  5  0  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT       FT    
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  67 67 
+next    1  2  3  0  5  0  
+prev    3  0  1  2  -1 -1 
+status  Z  D  D  D  F  F  
+           DT       FT    
+                 DH       
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  67 67 
+next    1  2  3  0  5  0  
+prev    3  0  1  2  -1 -1 
+status  Z  D  D  D  F  F  
+           DT       FT    
+                 DH       
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  67 67 
+next    1  2  3  0  5  0  
+prev    3  0  1  2  -1 -1 
+status  Z  D  D  D  F  F  
+           DT       FT    
+                 DH       
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  67 67 
+next    1  2  3  0  5  0  
+prev    3  0  1  2  -1 -1 
+status  Z  D  D  D  F  F  
+           DT          FT 
+                 DH       
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  67 
+next    1  2  3  4  0  0  
+prev    4  0  1  2  3  -1 
+status  Z  D  D  D  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  67 
+next    1  2  3  4  0  0  
+prev    4  0  1  2  3  -1 
+status  Z  D  D  D  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  67 
+next    1  2  3  4  0  0  
+prev    4  0  1  2  3  -1 
+status  Z  D  D  D  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  67 
+next    1  2  3  4  0  0  
+prev    4  0  1  2  3  -1 
+status  Z  D  D  D  D  F  
+        FT DT             
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelIndex(), line 461: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  3  4  5  0  
+prev    5  0  1  2  3  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 522: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  3  3  3  
+next    1  2  4  4  5  0  
+prev    5  0  1  2  2  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 539: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  3  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelIndex(), line 481: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  3  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelHead(), line 409: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  3  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 522: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  3  
+next    1  2  4  0  0  0  
+prev    4  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 539: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelHead(), line 425: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelHead(), line 409: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 522: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 3  67 
+next    1  2  0  0  0  3  
+prev    2  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from PutFreeIndex(), line 539: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  0  5  3  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT       FT    
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from ListDelHead(), line 425: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  0  5  3  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT       FT    
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  0  5  3  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT       FT    
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  0  5  3  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT       FT    
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 67 67 
+next    1  2  0  0  5  3  
+prev    2  0  1  -1 -1 -1 
+status  Z  D  D  F  F  F  
+           DT          FT 
+              DH          
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT          FT 
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  67 
+next    1  2  4  0  0  3  
+prev    4  0  1  -1 2  -1 
+status  Z  D  D  F  D  F  
+           DT    FT       
+                    DH    
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  7  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 331: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  7  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 491: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  7  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+           DT    FT       
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from GetFreeIndex(), line 508: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  67 7  7  
+next    1  2  4  0  5  0  
+prev    5  0  1  -1 2  4  
+status  Z  D  D  F  D  D  
+        FT DT             
+                       DH 
+
+<<<<<
+
+>>>>>
+Diagnostic from ListAddHead(), line 345: No fatal damage
+
+index   0  1  2  3  4  5  
+value   67 3  3  7  7  7  
+next    1  2  4  0  5  3  
+prev    3  0  1  5  2  4  
+status  Z  D  D  D  D  D  
+        FT DT             
+                 DH       
+
+<<<<<
+
