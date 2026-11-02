@@ -14,6 +14,8 @@ static FILE* List_log_file = stdout;
 #define LIST_LOG_FILE_NAME "list_log.txt"
 static FILE* List_graphviz_file = NULL;
 #define LIST_GRAPHVIZ_FILE_NAME "List_graphviz.dot"
+static FILE* List_html_log_file = NULL;
+#define LIST_HTML_LOG_FILE_NAME "List_log.html"
 
 #define BACK_COLOR "#34252c"
 
@@ -76,6 +78,9 @@ typedef enum {ZERO = 0, FREE = -1, DATA = 1} Status_t;
 
 #define INCORRECT_INDEX -1
 
+#define MAX_FILE_NAME_SIZE 100
+#define MAX_COMMAND_SIZE 200
+
 struct Node_colors_t {
     const char* line_color;
     const char* fill_color;
@@ -95,6 +100,8 @@ struct Doubly_linked_list_t {
     size_t size;
 
     size_t free_index;
+
+    int graphic_dump_number;
 
     List_err_t error;
     List_report_t last_function_success;
@@ -133,7 +140,17 @@ List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_
 
 void ListTechnicalDump(Doubly_linked_list_t* dl_list);
 
-void ListGraphicDump(Doubly_linked_list_t* dl_list);
+void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message);
+
+void ListStartLogging(Doubly_linked_list_t* dl_list);
+
+void ListCreateInformationTable(Doubly_linked_list_t* dl_list);
+
+void ListCreateDataTable(Doubly_linked_list_t* dl_list);
+
+const char* ListGetStatus(Doubly_linked_list_t* dl_list, size_t index);
+
+void ListCreateGraphic(Doubly_linked_list_t* dl_list);
 
 void ListCreatePng(Doubly_linked_list_t* dl_list);
 
@@ -160,34 +177,28 @@ int main() {
             return 1;
         }
     )
-    List_graphviz_file = fopen(LIST_GRAPHVIZ_FILE_NAME, "w");
-    if (List_graphviz_file == NULL) {
+    List_html_log_file = fopen(LIST_HTML_LOG_FILE_NAME, "w");
+    if (List_html_log_file == NULL) {
         printf("Cant open %s with \"w\" permission\n", LIST_GRAPHVIZ_FILE_NAME);
         return 1;
     }
 
     Doubly_linked_list_t* dllst_1 = ListInit(5);
 
-    ListTechnicalDump(dllst_1);
+    ListGraphicDump(dllst_1, "sweetie_dump1");
 
     ListAddHead(dllst_1, 3);
-    ListTechnicalDump(dllst_1);
     ListAddTail(dllst_1, 3);
-    ListTechnicalDump(dllst_1);
-
-    ListDelIndex(dllst_1, 0);
-    ListTechnicalDump(dllst_1);
 
     ListDelHead(dllst_1);
-    ListTechnicalDump(dllst_1);
     ListDelHead(dllst_1);
-    ListTechnicalDump(dllst_1);
 
     ListAddTail(dllst_1, 7);
-    ListTechnicalDump(dllst_1);
     ListAddHead(dllst_1, 6);
-    ListTechnicalDump(dllst_1);
-    ListGraphicDump(dllst_1);
+    ListAddHead(dllst_1, 56);
+    ListAddHead(dllst_1, 12);
+
+    ListGraphicDump(dllst_1, "sweetie_dump2");
 
     ListDestroy(dllst_1);
     fclose(List_log_file);
@@ -213,13 +224,15 @@ Doubly_linked_list_t* ListInit(size_t capacity) {
         return NULL;
     }
 
-    dl_list->error = LIST_NORMAL;
-    dl_list->last_function_success = SUCCESS;
-
     dl_list->capacity = capacity;
     dl_list->size = 0;
 
     dl_list->free_index = 1;
+
+    dl_list->graphic_dump_number = 1;
+
+    dl_list->error = LIST_NORMAL;
+    dl_list->last_function_success = SUCCESS;
 
     return dl_list;
 }
@@ -284,7 +297,7 @@ List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_typ
         return dl_list->last_function_success = FATAL_ERROR;
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index < 0) || (index > dl_list->capacity)) {
-        printf("note from %s(), line %d: index %d is out of range or not owned by list, %s was cancelled\n",
+        printf("note from %s(), line %d: index %ld is out of range or not owned by list, %s was cancelled\n",
                __func__, __LINE__, index, __func__);
         return dl_list->last_function_success = INCORRECT_INPUT;
     }
@@ -333,7 +346,7 @@ List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, size_t index) {
     }
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index <= 0) || (index > dl_list->capacity)) {
-        printf("note from %s(), line %d: index %d is out of range or not owned by list, %s was cancelled\n",
+        printf("note from %s(), line %d: index %ld is out of range or not owned by list, %s was cancelled\n",
                __func__, __LINE__, index, __func__);
         return dl_list->last_function_success = INCORRECT_INPUT;
     }
@@ -389,7 +402,7 @@ List_report_t PutFreeIndex(Doubly_linked_list_t* dl_list, size_t index) {
         return dl_list->last_function_success = FATAL_ERROR;
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index <= 0) || (index > dl_list->capacity)) {
-        printf("note from %s(), line %d: index %d is out of range or not owned by list, %s was cancelled\n",
+        printf("note from %s(), line %d: index %ld is out of range or not owned by list, %s was cancelled\n",
                __func__, __LINE__, index, __func__);
         return dl_list->last_function_success = INCORRECT_INPUT;
     }
@@ -413,16 +426,9 @@ List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_functio
     assert(dl_list != NULL); assert(calling_function_name != NULL); // konechnost spiska
     ONDEB(assert(List_log_file != NULL);)
 
-    ONDEB(fprintf(List_log_file, ">>>>>\n");)
-
     (void)ListDiagnoseError(dl_list, calling_function_name, from_line);
 
-    ONDEB(
-        fprintf(List_log_file, "\n");
-        ListTechnicalDump(dl_list);
-    )
-
-    ONDEB(fprintf(List_log_file, "<<<<<\n\n");)
+    ONDEB(ListGraphicDump(dl_list);)
 
     return dl_list->error;
 }
@@ -479,62 +485,166 @@ List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_
 }
 
 
-void ListTechnicalDump(Doubly_linked_list_t* dl_list) {
-    assert(dl_list != NULL);
+void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) { // FIXME krasnie strelochki esli cto-to ne tak
+    assert(dl_list != NULL); assert(message != NULL);
 
-    printf("index   ");
-    for (int i = 0; i <= dl_list->capacity; i++)
-        printf("%-2d ", i);
-    printf("\nvalue   ");
-    for (int i = 0; i <= dl_list->capacity; i++)
-        printf("%-2d ", dl_list->data[i].value);
-    printf("\nnext    ");
-    for (int i = 0; i <= dl_list->capacity; i++)
-        printf("%-2ld ", dl_list->data[i].next_index);
-    printf("\nprev    ");
-    for (int i = 0; i <= dl_list->capacity; i++)
-        printf("%-2ld ", dl_list->data[i].prev_index);
-    printf("\nstatus  ");
-    printf("%-2.2s ", "Z");
-    for (int i = 1; i <= dl_list->capacity; i++) {
-        if (dl_list->data[i].prev_index == INCORRECT_INDEX)
-            printf("%-2.2s ", "F"); // STUB %n
-        else
-            printf("%-2.2s ", "D");
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
     }
-    printf("\n        ");
-    for (int i = 0; i <= dl_list->capacity; i++) {
-        if (i == TAIL_INDEX)
-            printf("%-2.2s ", "DT");
-        else if (i == dl_list->free_index)
-            printf("%-2.2s ", "FT");
-        else
-            printf("%-2.2s ", "  ");
-    }
-    printf("\n        ");
-    for (int i = 0; i <= dl_list->capacity; i++) {
-        if (i == HEAD_INDEX)
-            printf("%-2.2s ", "DH");
-        else
-            printf("%-2.2s ", "  ");
-    }
-    printf("\n\n");
+
+    if (dl_list->graphic_dump_number == 1)
+        ListStartLogging(dl_list);
+
+    fprintf(List_html_log_file, "<h2>%s</h2>\n\n", message);
+
+    ListCreateInformationTable(dl_list);
+
+    ListCreateDataTable(dl_list);
+
+    ListCreateGraphic(dl_list);
+
+    fprintf(List_html_log_file, "<hr>\n\n");
+
+    dl_list->graphic_dump_number++;
 }
 
 
-void ListGraphicDump(Doubly_linked_list_t* dl_list) {
+void ListStartLogging(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
+    }
+
+    fprintf(List_html_log_file,
+        "<meta charset=\"UTF-8\">\n\n"
+        "<style>\n"
+        "\tbody {background-color: %s; font-family: sans-serif; margin: 20px;}\n"
+        "\th1 {text-align: center; color: %s;}\n"
+        "\th2 {text-align: center; color: %s;font-size: 20px; margin-top: 20px; margin-bottom: 20px;}\n"
+        "\th3 {color: %s; font-size: 18px; margin-top: 40px; margin-bottom: 10px;}\n"
+        "\thr {border: none; height: 3px; background-color: %s; margin: 20px 0;}\n"
+        "\ttable {border-collapse: collapse; max-width: fit-content;}\n"
+        "\ttd {border: 2px solid %s; padding: 10px; text-align: center; font-weight: bold; color: %s}\n"
+        "\t.data_table tr:first-child td {background-color: %s; font-size: 14px; font-weight: bold; color: %s;}\n"
+        "\t.list_information_table td:first-child {background-color: %s; font-size: 14px; font-weight: bold; color: %s;}\n"
+        "</style>\n\n"
+        "<h1>Log</h1>\n\n"
+        "<hr>\n\n",
+        BACK_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_LINE_COLOR,
+        NEXT_FILL_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR);
+}
+
+
+void ListCreateInformationTable(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
+    }
+
+    fprintf(List_html_log_file,
+        "<h3>Information</h3>\n"
+        "<table class = \"list_information_table\">\n"
+        "\t<tr><td>size</td><td>%ld</td></tr>\n"
+        "\t<tr><td>capacity</td><td>%ld</td></tr>\n"
+        "\t<tr><td>head index</td><td>%ld</td></tr>\n"
+        "\t<tr><td>tall index</td><td>%ld</td></tr>\n"
+        "\t<tr><td>free index</td><td>%ld</td></tr>\n"
+        "\t<tr><td>errors</td><td>no errors</td></tr>\n"  // FIXME errors
+        "</table>\n\n",
+        dl_list->size, dl_list->capacity, HEAD_INDEX, TAIL_INDEX, dl_list->free_index);
+}
+
+
+void ListCreateDataTable(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
+    }
+
+    fprintf(List_html_log_file, "<h3>Data</h3>\n<p style=\"font-size: 16px; font-weight: bold; color: %s; margin: 16px 0;\">\n tail -> ",
+           HEAD_FONT_COLOR);
+    for (size_t index = TAIL_INDEX; index != 0; index = dl_list->data[index].next_index)
+        fprintf(List_html_log_file, LIST_TYPE_SPECIFIER " -> ", dl_list->data[index].value);
+    fprintf(List_html_log_file, "head\n</p>\n");
+
+    fprintf(List_html_log_file, "<table class = \"data_table\">\n");
+    fprintf(List_html_log_file, "\t<tr><td>index</td><td>value</td><td>prev</td><td>next</td><td>status</td></tr>\n");
+    for (size_t index = 0; index <= dl_list->capacity; index++)
+        fprintf(List_html_log_file, "\t<tr><td>%ld</td><td>" LIST_TYPE_SPECIFIER "</td><td>%ld</td><td>%ld</td><td>%s</td></tr>\n",
+                index, dl_list->data[index].value, dl_list->data[index].prev_index, dl_list->data[index].next_index, ListGetStatus(dl_list, index));
+    fprintf(List_html_log_file, "</table>\n\n");
+}
+
+
+const char* ListGetStatus(Doubly_linked_list_t* dl_list, size_t index) {
+    assert(dl_list != NULL);
+
+    if ((index < 0) || (index > dl_list->capacity)) {
+        printf("note from %s(), line %d: index %ld is out of range, %s was cancelled\n",
+               __func__, __LINE__, index, __func__);
+        return "";
+    }
+
+    if (index == 0)
+        return "ZERO";
+    if (dl_list->data[index].prev_index == INCORRECT_INDEX)
+        return "FREE";
+    else
+        return "DATA";
+}
+
+
+void ListCreateGraphic(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    List_graphviz_file = fopen(LIST_GRAPHVIZ_FILE_NAME, "w");
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
+
     ListCreatePng(dl_list);
+
+    fclose(List_graphviz_file);
+    List_graphviz_file = NULL;
+
+    char dump_file_name[MAX_FILE_NAME_SIZE] = {};
+    sprintf(dump_file_name, "dump%d.png", dl_list->graphic_dump_number);
+
+    char command[MAX_COMMAND_SIZE] = {};
+    sprintf(command, "dot -Tpng %s -o %s", LIST_GRAPHVIZ_FILE_NAME, dump_file_name);
+
+    system(command);
+
+    fprintf(List_html_log_file, "<h3>Graphic</h3>\n<img src=\"%s\" alt=\"%s\">\n\n",
+            dump_file_name, dump_file_name);
 }
 
 
 void ListCreatePng(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
+
     fprintf(List_graphviz_file, "digraph G {\n\n");
     fprintf(List_graphviz_file, "bgcolor = \"%s\"\n", BACK_COLOR);
-    fprintf(List_graphviz_file, "node [shape = Mrecord, style = \"filled\"];\n\n");
+    fprintf(List_graphviz_file, "node [shape = none];\n\n");
 
     ListCreateNodes(dl_list);
 
@@ -548,6 +658,12 @@ void ListCreatePng(Doubly_linked_list_t* dl_list) {
 
 void ListCreateNodes(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
+
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
 
     for (size_t index = 0; index <= dl_list->capacity; index++) {
         Node_colors_t node_colors = {};
@@ -570,13 +686,23 @@ void ListCreateNodes(Doubly_linked_list_t* dl_list) {
 
     fprintf(List_graphviz_file, "{rank = same;");
     for (size_t index = 0; index <= dl_list->capacity; index++)
-        fprintf(List_graphviz_file, "node%ld;", index);
+        fprintf(List_graphviz_file, "node%ld;%s", index, (index != dl_list->capacity) ? " " : "");
     fprintf(List_graphviz_file, "}\n\n");
+
+    for (size_t index = 0; index < dl_list->capacity; index++)
+        fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, style = invis];\n", index, index + 1);
+    fprintf(List_graphviz_file, "\n");
 }
 
 
 void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const char* fill_color, const char* font_color) {
     assert(node_colors != NULL);
+
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
 
     node_colors->line_color = line_color;
     node_colors->fill_color = fill_color;
@@ -587,20 +713,44 @@ void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const cha
 void ListCreateNode(Doubly_linked_list_t* dl_list, size_t index, Node_colors_t* node_colors) {
     assert(dl_list != NULL); assert(node_colors != NULL);
 
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
+
+    if ((index < 0) || (index > dl_list->capacity)) {
+        printf("note from %s(), line %d: index %ld is out of range, %s was cancelled\n",
+               __func__, __LINE__, index, __func__);
+        return;
+    }
+
     fprintf(List_graphviz_file,
-        "node%ld [\n"
-            "\tlabel = \"{{index = %ld}|{value = %d}|{prev = %ld|next = %ld}}\",\n"
-            "\tcolor = \"%s\",\n"
-            "\tfillcolor = \"%s\",\n"
-            "\tfontcolor = \"%s\"\n"
-        "];\n\n",
-        index, index, dl_list->data[index].value, dl_list->data[index].prev_index, dl_list->data[index].next_index,
-        node_colors->line_color, node_colors->fill_color, node_colors->font_color);
+        "node%ld [label=<\n"
+            "\t<TABLE BORDER = \"1\" CELLBORDER = \"0\" CELLSPACING = \"0\" CELLPADDING=\"4\" STYLE = \"ROUNDED\"\n"
+            "\tCOLOR = \"%s\"\n"
+            "\tBGCOLOR = \"%s\">\n"
+            "\t<TR><TD COLSPAN = \"2\"><FONT COLOR = \"%s\">index = %ld</FONT></TD></TR><HR/>\n"
+            "\t<TR><TD COLSPAN = \"2\"><FONT COLOR = \"%s\">value = " LIST_TYPE_SPECIFIER "</FONT></TD></TR><HR/>\n"
+            "\t<TR><TD><FONT COLOR = \"%s\">prev = %ld</FONT></TD><VR/><TD><FONT COLOR = \"%s\">next = %ld</FONT></TD></TR>\n"
+            "\t</TABLE>\n"
+        ">];\n\n",
+        index, node_colors->line_color, node_colors->fill_color,
+        node_colors->font_color, index,
+        node_colors->font_color, dl_list->data[index].value,
+        node_colors->font_color, dl_list->data[index].prev_index,
+        node_colors->font_color, dl_list->data[index].next_index);
 }
 
 
 void ListCreateMarkers(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
+
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
 
     Node_colors_t node_colors = {};
 
@@ -618,18 +768,24 @@ void ListCreateMarkers(Doubly_linked_list_t* dl_list) {
 void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const char* marker_name, Node_colors_t* node_colors) {
     assert(dl_list != NULL); assert(marker_name != NULL); assert(node_colors != NULL);
 
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
+
     fprintf(List_graphviz_file,
         "%s [\n"
-            "\tlabel = \"%s\",\n"
-            "\tcolor = \"%s\",\n"
-            "\tfillcolor = \"%s\",\n"
-            "\tfontcolor = \"%s\",\n"
-            "\tgroup = \"g1\"\n"
-        "];\n",
+	        "\tlabel = \"%s\", shape = box, style = \"rounded, filled\",\n"
+	        "\tcolor = \"%s\",\n"
+	        "\tfillcolor = \"%s\",\n"
+	        "\tfontcolor = \"%s\",\n"
+	        "\tgroup = \"g1\"\n"
+        "];\n\n",
         marker_name, marker_name,
         node_colors->line_color, node_colors->fill_color, node_colors->font_color);
 
-    fprintf(List_graphviz_file, "%s -> node%d [dir = forward, color = \"%s\"];\n\n",
+    fprintf(List_graphviz_file, "%s -> node%ld [dir = forward, style = invis, penwidth=2, color = \"%s\"];\n\n",
             marker_name, marker_index, node_colors->fill_color);
 }
 
@@ -637,11 +793,18 @@ void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const 
 void ListCreateLinks(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    for (size_t index = 0; index <= dl_list->capacity; index++) {
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
+
+    for (size_t index = 1; index <= dl_list->capacity; index++) {
         Node_colors_t node_colors = {};
 
-        if (dl_list->data[index].prev_index == INCORRECT_INDEX)
+        if (dl_list->data[index].prev_index == INCORRECT_INDEX) {
             ListCreateLink(dl_list, index, NULL, NEXT_FILL_COLOR);
+        }
         else
             ListCreateLink(dl_list, index, HEAD_FILL_COLOR, TAIL_FILL_COLOR);
     }
@@ -651,13 +814,23 @@ void ListCreateLinks(Doubly_linked_list_t* dl_list) {
 void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* prev_color, const char* next_color) {
     assert(dl_list != NULL);
 
-    if (prev_color != NULL)
-        fprintf(List_graphviz_file, "node%ld -> node%ld [dir = back, color = \"%s\", constraint = false];\n",
-                index, dl_list->data[index].prev_index, prev_color);
+    if (List_graphviz_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_GRAPHVIZ_FILE_NAME, __func__);
+        return;
+    }
 
-    if (next_color != NULL)
-        fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, color = \"%s\", constraint = false];\n",
-                index, dl_list->data[index].next_index, next_color);
+    if (prev_color != NULL) {
+        if (dl_list->data[index].prev_index != 0)
+            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
+                    index, dl_list->data[index].prev_index, prev_color);
+    }
+
+    if (next_color != NULL) {
+        if (dl_list->data[index].next_index != 0)
+            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
+                    index, dl_list->data[index].next_index, next_color);
+    }
 
     fprintf(List_graphviz_file, "\n");
 }

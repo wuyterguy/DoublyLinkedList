@@ -1,0 +1,80 @@
+<meta charset="UTF-8">
+
+<style>
+	body {background-color: #34252c; font-family: sans-serif; margin: 20px;}
+	h1 {text-align: center; color: #ca80a2;}
+	h2 {text-align: center; color: #ca80a2;font-size: 20px; margin-top: 20px; margin-bottom: 20px;}
+	h3 {color: #ca80a2; font-size: 18px; margin-top: 40px; margin-bottom: 10px;}
+	hr {border: none; height: 3px; background-color: #ca80a2; margin: 20px 0;}
+	table {border-collapse: collapse; max-width: fit-content;}
+	td {border: 2px solid #260a18; padding: 10px; text-align: center; font-weight: bold; color: #06a07c}
+	.data_table tr:first-child td {background-color: #591837; font-size: 14px; font-weight: bold; color: #ca80a2;}
+	.list_information_table td:first-child {background-color: #591837; font-size: 14px; font-weight: bold; color: #ca80a2;}
+</style>
+
+<h1>Log</h1>
+
+<hr>
+
+<h2>sweetie_dump1</h2>
+
+<h3>Information</h3>
+<table class = "list_information_table">
+	<tr><td>size</td><td>0</td></tr>
+	<tr><td>capacity</td><td>5</td></tr>
+	<tr><td>head index</td><td>0</td></tr>
+	<tr><td>tall index</td><td>0</td></tr>
+	<tr><td>free index</td><td>1</td></tr>
+	<tr><td>errors</td><td>no errors</td></tr>
+</table>
+
+<h3>Data</h3>
+<p style="font-size: 16px; font-weight: bold; color: #ca80a2; margin: 16px 0;">
+ tail -> head
+</p>
+<table class = "data_table">
+	<tr><td>index</td><td>value</td><td>prev</td><td>next</td><td>status</td></tr>
+	<tr><td>0</td><td>67</td><td>0</td><td>0</td><td>ZERO</td></tr>
+	<tr><td>1</td><td>67</td><td>-1</td><td>2</td><td>FREE</td></tr>
+	<tr><td>2</td><td>67</td><td>-1</td><td>3</td><td>FREE</td></tr>
+	<tr><td>3</td><td>67</td><td>-1</td><td>4</td><td>FREE</td></tr>
+	<tr><td>4</td><td>67</td><td>-1</td><td>5</td><td>FREE</td></tr>
+	<tr><td>5</td><td>67</td><td>-1</td><td>0</td><td>FREE</td></tr>
+</table>
+
+<h3>Graphic</h3>
+<img src="dump1.png" alt="dump1.png">
+
+<hr>
+
+<h2>sweetie_dump2</h2>
+
+<h3>Information</h3>
+<table class = "list_information_table">
+	<tr><td>size</td><td>4</td></tr>
+	<tr><td>capacity</td><td>5</td></tr>
+	<tr><td>head index</td><td>4</td></tr>
+	<tr><td>tall index</td><td>2</td></tr>
+	<tr><td>free index</td><td>5</td></tr>
+	<tr><td>errors</td><td>no errors</td></tr>
+</table>
+
+<h3>Data</h3>
+<p style="font-size: 16px; font-weight: bold; color: #ca80a2; margin: 16px 0;">
+ tail -> 7 -> 6 -> 56 -> 12 -> head
+</p>
+<table class = "data_table">
+	<tr><td>index</td><td>value</td><td>prev</td><td>next</td><td>status</td></tr>
+	<tr><td>0</td><td>67</td><td>4</td><td>2</td><td>ZERO</td></tr>
+	<tr><td>1</td><td>6</td><td>2</td><td>3</td><td>DATA</td></tr>
+	<tr><td>2</td><td>7</td><td>0</td><td>1</td><td>DATA</td></tr>
+	<tr><td>3</td><td>56</td><td>1</td><td>4</td><td>DATA</td></tr>
+	<tr><td>4</td><td>12</td><td>3</td><td>0</td><td>DATA</td></tr>
+	<tr><td>5</td><td>67</td><td>-1</td><td>0</td><td>FREE</td></tr>
+</table>
+
+<h3>Graphic</h3>
+<img src="dump2.png" alt="dump2.png">
+
+<hr>
+
