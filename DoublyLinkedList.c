@@ -15,6 +15,8 @@ static FILE* List_log_file = stdout;
 static FILE* List_graphviz_file = NULL;
 #define LIST_GRAPHVIZ_FILE_NAME "List_graphviz.dot"
 
+#define BACK_COLOR "#34252c"
+
 #define ZERO_LINE_COLOR "#260a18"
 #define ZERO_FILL_COLOR "#77606b"
 #define ZERO_FONT_COLOR "#260a18"
@@ -23,16 +25,16 @@ static FILE* List_graphviz_file = NULL;
 #define DATA_FILL_COLOR "#94285c"
 #define DATA_FONT_COLOR "#260a18"
 
-#define HEAD_LINE_COLOR "#430523"
-#define HEAD_FILL_COLOR "#ca80a2"
-#define HEAD_FONT_COLOR "#3f1229"
+#define HEAD_LINE_COLOR "#260a18"
+#define HEAD_FILL_COLOR "#591837"
+#define HEAD_FONT_COLOR "#ca80a2"
 
-#define TAIL_LINE_COLOR "#260a18"
-#define TAIL_FILL_COLOR "#591837"
-#define TAIL_FONT_COLOR "#ca80a2"
+#define TAIL_LINE_COLOR "#430523"
+#define TAIL_FILL_COLOR "#ca80a2"
+#define TAIL_FONT_COLOR "#3f1229"
 
 #define NEXT_LINE_COLOR "#063a2e"
-#define NEXT_FILL_COLOR "#43ba9f"
+#define NEXT_FILL_COLOR "#06a07c"
 #define NEXT_FONT_COLOR "#0a2920"
 
 #define FREE_LINE_COLOR "#03261e"
@@ -129,15 +131,25 @@ List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_functio
 
 List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line);
 
-void ListDump(Doubly_linked_list_t* dl_list);
+void ListTechnicalDump(Doubly_linked_list_t* dl_list);
 
 void ListGraphicDump(Doubly_linked_list_t* dl_list);
 
 void ListCreatePng(Doubly_linked_list_t* dl_list);
 
+void ListCreateNodes(Doubly_linked_list_t* dl_list);
+
 void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const char* fill_color, const char* font_color);
 
 void ListCreateNode(Doubly_linked_list_t* dl_list, size_t index, Node_colors_t* node_colors);
+
+void ListCreateMarkers(Doubly_linked_list_t* dl_list);
+
+void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const char* marker_name, Node_colors_t* node_colors);
+
+void ListCreateLinks(Doubly_linked_list_t* dl_list);
+
+void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* prev_color, const char* next_color);
 
 
 int main() {
@@ -156,25 +168,25 @@ int main() {
 
     Doubly_linked_list_t* dllst_1 = ListInit(5);
 
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
 
     ListAddHead(dllst_1, 3);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
     ListAddTail(dllst_1, 3);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
 
     ListDelIndex(dllst_1, 0);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
 
     ListDelHead(dllst_1);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
     ListDelHead(dllst_1);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
 
     ListAddTail(dllst_1, 7);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
     ListAddHead(dllst_1, 6);
-    ListDump(dllst_1);
+    ListTechnicalDump(dllst_1);
     ListGraphicDump(dllst_1);
 
     ListDestroy(dllst_1);
@@ -397,7 +409,7 @@ List_report_t PutFreeIndex(Doubly_linked_list_t* dl_list, size_t index) {
 }
 
 
-List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line) {
+List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line) { // FIXME obhod na cicli
     assert(dl_list != NULL); assert(calling_function_name != NULL); // konechnost spiska
     ONDEB(assert(List_log_file != NULL);)
 
@@ -407,7 +419,7 @@ List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_functio
 
     ONDEB(
         fprintf(List_log_file, "\n");
-        ListDump(dl_list);
+        ListTechnicalDump(dl_list);
     )
 
     ONDEB(fprintf(List_log_file, "<<<<<\n\n");)
@@ -467,46 +479,46 @@ List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_
 }
 
 
-void ListDump(Doubly_linked_list_t* dl_list) {
+void ListTechnicalDump(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    fprintf(List_log_file, "index   ");
+    printf("index   ");
     for (int i = 0; i <= dl_list->capacity; i++)
-        fprintf(List_log_file, "%-2d ", i);
-    fprintf(List_log_file, "\nvalue   ");
+        printf("%-2d ", i);
+    printf("\nvalue   ");
     for (int i = 0; i <= dl_list->capacity; i++)
-        fprintf(List_log_file, "%-2d ", dl_list->data[i].value);
-    fprintf(List_log_file, "\nnext    ");
+        printf("%-2d ", dl_list->data[i].value);
+    printf("\nnext    ");
     for (int i = 0; i <= dl_list->capacity; i++)
-        fprintf(List_log_file, "%-2ld ", dl_list->data[i].next_index);
-    fprintf(List_log_file, "\nprev    ");
+        printf("%-2ld ", dl_list->data[i].next_index);
+    printf("\nprev    ");
     for (int i = 0; i <= dl_list->capacity; i++)
-        fprintf(List_log_file, "%-2ld ", dl_list->data[i].prev_index);
-    fprintf(List_log_file, "\nstatus  ");
-    fprintf(List_log_file, "%-2.2s ", "Z");
+        printf("%-2ld ", dl_list->data[i].prev_index);
+    printf("\nstatus  ");
+    printf("%-2.2s ", "Z");
     for (int i = 1; i <= dl_list->capacity; i++) {
         if (dl_list->data[i].prev_index == INCORRECT_INDEX)
-            fprintf(List_log_file, "%-2.2s ", "F");
+            printf("%-2.2s ", "F"); // STUB %n
         else
-            fprintf(List_log_file, "%-2.2s ", "D");
+            printf("%-2.2s ", "D");
     }
-    fprintf(List_log_file, "\n        ");
+    printf("\n        ");
     for (int i = 0; i <= dl_list->capacity; i++) {
         if (i == TAIL_INDEX)
-            fprintf(List_log_file, "%-2.2s ", "DT");
+            printf("%-2.2s ", "DT");
         else if (i == dl_list->free_index)
-            fprintf(List_log_file, "%-2.2s ", "FT");
+            printf("%-2.2s ", "FT");
         else
-            fprintf(List_log_file, "%-2.2s ", "  ");
+            printf("%-2.2s ", "  ");
     }
-    fprintf(List_log_file, "\n        ");
+    printf("\n        ");
     for (int i = 0; i <= dl_list->capacity; i++) {
         if (i == HEAD_INDEX)
-            fprintf(List_log_file, "%-2.2s ", "DH");
+            printf("%-2.2s ", "DH");
         else
-            fprintf(List_log_file, "%-2.2s ", "  ");
+            printf("%-2.2s ", "  ");
     }
-    fprintf(List_log_file, "\n\n");
+    printf("\n\n");
 }
 
 
@@ -520,9 +532,22 @@ void ListGraphicDump(Doubly_linked_list_t* dl_list) {
 void ListCreatePng(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    fprintf(List_graphviz_file, "digraph G {\n");
+    fprintf(List_graphviz_file, "digraph G {\n\n");
+    fprintf(List_graphviz_file, "bgcolor = \"%s\"\n", BACK_COLOR);
+    fprintf(List_graphviz_file, "node [shape = Mrecord, style = \"filled\"];\n\n");
 
-    fprintf(List_graphviz_file, "node [shape=Mrecord, style=\"filled\"];\n");
+    ListCreateNodes(dl_list);
+
+    ListCreateMarkers(dl_list);
+
+    ListCreateLinks(dl_list);
+
+    fprintf(List_graphviz_file, "}\n");
+}
+
+
+void ListCreateNodes(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
 
     for (size_t index = 0; index <= dl_list->capacity; index++) {
         Node_colors_t node_colors = {};
@@ -543,7 +568,10 @@ void ListCreatePng(Doubly_linked_list_t* dl_list) {
         ListCreateNode(dl_list, index, &node_colors);
     }
 
-    fprintf(List_graphviz_file, "}\n");
+    fprintf(List_graphviz_file, "{rank = same;");
+    for (size_t index = 0; index <= dl_list->capacity; index++)
+        fprintf(List_graphviz_file, "node%ld;", index);
+    fprintf(List_graphviz_file, "}\n\n");
 }
 
 
@@ -560,12 +588,76 @@ void ListCreateNode(Doubly_linked_list_t* dl_list, size_t index, Node_colors_t* 
     assert(dl_list != NULL); assert(node_colors != NULL);
 
     fprintf(List_graphviz_file,
-        "node%d [\n"
-            "\tlabel=\"{{index = %ld}|{value = %d}|{prev = %ld|next = %ld}}\",\n"
-            "\tcolor=\"%s\",\n"
-            "\tfillcolor=\"%s\",\n"
-            "\tfontcolor=\"%s\"\n"
-        "];\n",
+        "node%ld [\n"
+            "\tlabel = \"{{index = %ld}|{value = %d}|{prev = %ld|next = %ld}}\",\n"
+            "\tcolor = \"%s\",\n"
+            "\tfillcolor = \"%s\",\n"
+            "\tfontcolor = \"%s\"\n"
+        "];\n\n",
         index, index, dl_list->data[index].value, dl_list->data[index].prev_index, dl_list->data[index].next_index,
         node_colors->line_color, node_colors->fill_color, node_colors->font_color);
+}
+
+
+void ListCreateMarkers(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    Node_colors_t node_colors = {};
+
+    SetNodeColors(&node_colors, NEXT_LINE_COLOR, NEXT_FILL_COLOR, NEXT_FONT_COLOR);
+    ListCreateMarker(dl_list, dl_list->free_index, "free", &node_colors);
+
+    SetNodeColors(&node_colors, HEAD_LINE_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR);
+    ListCreateMarker(dl_list, HEAD_INDEX, "head", &node_colors);
+
+    SetNodeColors(&node_colors, TAIL_LINE_COLOR, TAIL_FILL_COLOR, TAIL_FONT_COLOR);
+    ListCreateMarker(dl_list, TAIL_INDEX, "tail", &node_colors);
+}
+
+
+void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const char* marker_name, Node_colors_t* node_colors) {
+    assert(dl_list != NULL); assert(marker_name != NULL); assert(node_colors != NULL);
+
+    fprintf(List_graphviz_file,
+        "%s [\n"
+            "\tlabel = \"%s\",\n"
+            "\tcolor = \"%s\",\n"
+            "\tfillcolor = \"%s\",\n"
+            "\tfontcolor = \"%s\",\n"
+            "\tgroup = \"g1\"\n"
+        "];\n",
+        marker_name, marker_name,
+        node_colors->line_color, node_colors->fill_color, node_colors->font_color);
+
+    fprintf(List_graphviz_file, "%s -> node%d [dir = forward, color = \"%s\"];\n\n",
+            marker_name, marker_index, node_colors->fill_color);
+}
+
+
+void ListCreateLinks(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    for (size_t index = 0; index <= dl_list->capacity; index++) {
+        Node_colors_t node_colors = {};
+
+        if (dl_list->data[index].prev_index == INCORRECT_INDEX)
+            ListCreateLink(dl_list, index, NULL, NEXT_FILL_COLOR);
+        else
+            ListCreateLink(dl_list, index, HEAD_FILL_COLOR, TAIL_FILL_COLOR);
+    }
+}
+
+
+void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* prev_color, const char* next_color) {
+    assert(dl_list != NULL);
+
+    if (prev_color != NULL)
+        fprintf(List_graphviz_file, "node%ld -> node%ld [dir = back, color = \"%s\", constraint = false];\n",
+                index, dl_list->data[index].prev_index, prev_color);
+
+    if (next_color != NULL)
+        fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, color = \"%s\", constraint = false];\n",
+                index, dl_list->data[index].next_index, next_color);
+
+    fprintf(List_graphviz_file, "\n");
 }

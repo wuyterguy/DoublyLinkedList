@@ -1,39 +1,87 @@
 digraph G {
-node [shape=Mrecord, style="filled"];
-node0 [
-	label="{{index = 0}|{value = 67}|{prev = 1|next = 2}}",
-	color="#260a18",
-	fillcolor="#77606b",
-	fontcolor="#260a18"
-];
+
+bgcolor = "#34252c"
+node [shape = none];
+
+myNode [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4"
+           STYLE="ROUNDED"
+           COLOR="#FF0000"
+           BGCOLOR="#CCE5FF">
+        <TR><TD COLSPAN="2">index</TD></TR>
+        <HR/>
+        <TR><TD COLSPAN="2">value</TD></TR>
+        <HR/>
+        <TR>
+            <TD>prev</TD>
+            <VR/>
+            <TD>next</TD>
+        </TR>
+    </TABLE>
+>];
+
 node1 [
-	label="{{index = 1}|{value = 6}|{prev = 2|next = 0}}",
-	color="#430523",
-	fillcolor="#ca80a2",
-	fontcolor="#3f1229"
+	label = "{{index = 1}|{value = 6}|{prev = 2|next = 0}}",
+	color = "#260a18",
+	fillcolor = "#591837",
+	fontcolor = "#ca80a2"
 ];
+
 node2 [
-	label="{{index = 2}|{value = 7}|{prev = 0|next = 1}}",
-	color="#260a18",
-	fillcolor="#591837",
-	fontcolor="#ca80a2"
+	label = "{{index = 2}|{value = 7}|{prev = 0|next = 1}}",
+	color = "#430523",
+	fillcolor = "#ca80a2",
+	fontcolor = "#3f1229"
 ];
+
 node3 [
-	label="{{index = 3}|{value = 67}|{prev = -1|next = 4}}",
-	color="#063a2e",
-	fillcolor="#43ba9f",
-	fontcolor="#0a2920"
+	label = "{{index = 3}|{value = 67}|{prev = -1|next = 4}}",
+	color = "#063a2e",
+	fillcolor = "#06a07c",
+	fontcolor = "#0a2920"
 ];
+
 node4 [
-	label="{{index = 4}|{value = 67}|{prev = -1|next = 5}}",
-	color="#03261e",
-	fillcolor="#037f62",
-	fontcolor="#05120e"
+	label = "{{index = 4}|{value = 67}|{prev = -1|next = 5}}",
+	color = "#03261e",
+	fillcolor = "#037f62",
+	fontcolor = "#05120e"
 ];
+
 node5 [
-	label="{{index = 5}|{value = 67}|{prev = -1|next = 0}}",
-	color="#03261e",
-	fillcolor="#037f62",
-	fontcolor="#05120e"
+	label = "{{index = 5}|{value = 67}|{prev = -1|next = 0}}",
+	color = "#03261e",
+	fillcolor = "#037f62",
+	fontcolor = "#05120e"
 ];
+
+{rank = same;node0;node1;node2;node3;node4;node5;}
+
+free [
+	label = "free",
+	color = "#063a2e",
+	fillcolor = "#06a07c",
+	fontcolor = "#0a2920",
+	group = "g1"
+];
+free -> node3 [dir = forward, color = "#06a07c"];
+
+head [
+	label = "head",
+	color = "#260a18",
+	fillcolor = "#591837",
+	fontcolor = "#ca80a2",
+	group = "g1"
+];
+head -> node1 [dir = forward, color = "#591837"];
+
+tail [
+	label = "tail",
+	color = "#430523",
+	fillcolor = "#ca80a2",
+	fontcolor = "#3f1229",
+	group = "g1"
+];
+tail -> node2 [dir = forward, color = "#ca80a2"];
+
 }
