@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define NDEBUG
+#define DEBUG
 
 #ifdef DEBUG
     #define ONDEB(...) __VA_ARGS__
@@ -13,11 +13,14 @@
 static FILE* List_log_file = stdout;
 #define LIST_LOG_FILE_NAME "list_log.txt"
 static FILE* List_graphviz_file = NULL;
-#define LIST_GRAPHVIZ_FILE_NAME "List_graphviz.dot"
+#define LIST_GRAPHVIZ_FILE_NAME "list_graphviz.dot"
 static FILE* List_html_log_file = NULL;
-#define LIST_HTML_LOG_FILE_NAME "List_log.html"
+#define LIST_HTML_LOG_FILE_NAME "list_log.html"
 
 #define BACK_COLOR "#34252c"
+
+#define FORWARD_ERROR_COLOR "#e13d3d"
+#define BACK_ERROR_COLOR    "#780b0b"
 
 #define ZERO_LINE_COLOR "#260a18"
 #define ZERO_FILL_COLOR "#77606b"
@@ -43,11 +46,13 @@ static FILE* List_html_log_file = NULL;
 #define FREE_FILL_COLOR "#037f62"
 #define FREE_FONT_COLOR "#05120e"
 
-typedef enum {LIST_NORMAL          = 0b00000000, LIST_DATA_ERROR      = 0b00000001,
-              LIST_CAPACITY_ERROR  = 0b00000010, LIST_SIZE_ERROR      = 0b00000100,
+#undef OVERFLOW
+
+typedef enum {LIST_NORMAL           = 0b00000000, LIST_DATA_ERROR       = 0b00000001,
+              LIST_CAPACITY_ERROR   = 0b00000010, LIST_SIZE_ERROR       = 0b00000100,
               LIST_HEAD_INDEX_ERROR = 0b00001000, LIST_TAIL_INDEX_ERROR = 0b00010000,
-              /*LIST_FREE_HEAD_ERROR = 0b00100000,*/ LIST_FREE_INDEX_ERROR = 0b01000000,
-              LIST_ZERO_ERROR      = 0b10000000}                                              List_err_t;
+              LIST_FREE_INDEX_ERROR = 0b00100000, LIST_ZERO_ERROR       = 0b01000000,
+              LIST_LINK_ERROR       = 0b10000000}                                             List_err_t;
 typedef enum {SUCCESS = 0, FATAL_ERROR = 1, OVERFLOW = -1, VACUUM = -2, INCORRECT_INPUT = -3} List_report_t;
 
 #define LIST_TYPE INT
@@ -74,11 +79,14 @@ typedef enum {SUCCESS = 0, FATAL_ERROR = 1, OVERFLOW = -1, VACUUM = -2, INCORREC
     #define POISON 166666666667
 #endif
 
-typedef enum {ZERO = 0, FREE = -1, DATA = 1} Status_t;
+typedef enum {QUIET = 0, LOUD = 1} Volume_t;
+
+#define LIST_DUMP_FOLDER_NAME "dump_pictures"
 
 #define INCORRECT_INDEX -1
 
 #define MAX_FILE_NAME_SIZE 100
+#define MAX_MESSAGE_SIZE 200
 #define MAX_COMMAND_SIZE 200
 
 struct Node_colors_t {
@@ -87,34 +95,39 @@ struct Node_colors_t {
     const char* font_color;
 };
 
-struct List_element_t {
+struct List_data_t {
     List_type_t value;
-    size_t next_index;
-    size_t prev_index;
+    ssize_t next_index;
+    ssize_t prev_index;
 };
 
 struct Doubly_linked_list_t {
-    List_element_t* data;
+    List_data_t* data;
 
-    size_t capacity;
-    size_t size;
+    ssize_t capacity;
+    ssize_t size;
 
-    size_t free_index;
+    ssize_t free_index;
 
-    int graphic_dump_number;
+    int graphic_dump_number;   // REVIEW dump number
 
     List_err_t error;
     List_report_t last_function_success;
 };
 
+#define HEAD_INDEX dl_list->data[0].prev_index
+#define TAIL_INDEX dl_list->data[0].next_index
+
 #define PrintErrorMessage(message, object)                                                         \
     fprintf(stderr, "%s: %s(): %s - %s, line %d\n", __FILE__, __func__, message, #object, __LINE__);
 
-#define LIST_VERIFY(dl_list) ListVerify(dl_list, __func__, __LINE__)
+#define LIST_VERIFY(dl_list, volume) ListVerify(dl_list, volume, __func__, __LINE__)
 
-Doubly_linked_list_t* ListInit(size_t capacity);
+List_data_t ListData(Doubly_linked_list_t* dl_list, ssize_t index); // STUB func obrasheniya po indexu
 
-List_element_t* ListDataInit(size_t capacity);
+Doubly_linked_list_t* ListInit(ssize_t capacity);
+
+List_data_t* ListDataInit(ssize_t capacity);
 
 void ListDestroy(Doubly_linked_list_t* dl_list); // REVIEW return err
 
@@ -122,23 +135,27 @@ List_report_t ListAddHead(Doubly_linked_list_t* dl_list, List_type_t value); // 
 
 List_report_t ListAddTail(Doubly_linked_list_t* dl_list, List_type_t value);
 
-List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_type_t value);
+List_report_t ListAddBeforeIndex(Doubly_linked_list_t* dl_list, ssize_t index, List_type_t value);
+
+List_report_t ListAddAfterIndex(Doubly_linked_list_t* dl_list, ssize_t index, List_type_t value);
 
 List_report_t ListDelHead(Doubly_linked_list_t* dl_list);
 
 List_report_t ListDelTail(Doubly_linked_list_t* dl_list);
 
-List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, size_t index);
+List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, ssize_t index);
 
-size_t GetFreeIndex(Doubly_linked_list_t* dl_list);
+ssize_t ListGetFreeIndex(Doubly_linked_list_t* dl_list);
 
-List_report_t PutFreeIndex(Doubly_linked_list_t* dl_list, size_t index);
+List_report_t ListPutFreeIndex(Doubly_linked_list_t* dl_list, ssize_t index);
 
-List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line);
+List_err_t ListVerify(Doubly_linked_list_t* dl_list, Volume_t volume,
+                      const char* calling_function_name, int from_line);
 
-List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line);
+List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, Volume_t volume,
+                             const char* calling_function_name, int from_line);
 
-void ListTechnicalDump(Doubly_linked_list_t* dl_list);
+List_err_t ListCheckCycleError(Doubly_linked_list_t* dl_list);
 
 void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message);
 
@@ -146,9 +163,13 @@ void ListStartLogging(Doubly_linked_list_t* dl_list);
 
 void ListCreateInformationTable(Doubly_linked_list_t* dl_list);
 
+void ListHtmlPrintErrors(Doubly_linked_list_t* dl_list);
+
 void ListCreateDataTable(Doubly_linked_list_t* dl_list);
 
-const char* ListGetStatus(Doubly_linked_list_t* dl_list, size_t index);
+void ListCreateSubsequence(Doubly_linked_list_t* dl_list);
+
+const char* ListGetStatus(Doubly_linked_list_t* dl_list, ssize_t index);
 
 void ListCreateGraphic(Doubly_linked_list_t* dl_list);
 
@@ -156,17 +177,20 @@ void ListCreatePng(Doubly_linked_list_t* dl_list);
 
 void ListCreateNodes(Doubly_linked_list_t* dl_list);
 
-void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const char* fill_color, const char* font_color);
+void SetNodeColors(Node_colors_t* node_colors,
+                   const char* line_color, const char* fill_color, const char* font_color);
 
-void ListCreateNode(Doubly_linked_list_t* dl_list, size_t index, Node_colors_t* node_colors);
+void ListCreateNode(Doubly_linked_list_t* dl_list, ssize_t index, Node_colors_t* node_colors);
 
 void ListCreateMarkers(Doubly_linked_list_t* dl_list);
 
-void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const char* marker_name, Node_colors_t* node_colors);
+void ListCreateMarker(Doubly_linked_list_t* dl_list, ssize_t marker_index, const char* marker_name,
+                      Node_colors_t* node_colors);
 
 void ListCreateLinks(Doubly_linked_list_t* dl_list);
 
-void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* prev_color, const char* next_color);
+void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* prev_color,
+                    const char* next_color);
 
 
 int main() {
@@ -183,9 +207,9 @@ int main() {
         return 1;
     }
 
-    Doubly_linked_list_t* dllst_1 = ListInit(5);
+    Doubly_linked_list_t* dllst_1 = ListInit(15);
 
-    ListGraphicDump(dllst_1, "sweetie_dump1");
+    //ListGraphicDump(dllst_1, "sweetie_dump1");
 
     ListAddHead(dllst_1, 3);
     ListAddTail(dllst_1, 3);
@@ -196,9 +220,12 @@ int main() {
     ListAddTail(dllst_1, 7);
     ListAddHead(dllst_1, 6);
     ListAddHead(dllst_1, 56);
+
+    dllst_1->data[1].next_index = 7;
+
     ListAddHead(dllst_1, 12);
 
-    ListGraphicDump(dllst_1, "sweetie_dump2");
+    //ListGraphicDump(dllst_1, "sweetie_dump2");
 
     ListDestroy(dllst_1);
     fclose(List_log_file);
@@ -208,10 +235,20 @@ int main() {
 }
 
 
-#define HEAD_INDEX dl_list->data[0].prev_index
-#define TAIL_INDEX dl_list->data[0].next_index
+List_data_t ListData(Doubly_linked_list_t* dl_list, ssize_t index) {
+    assert(dl_list != NULL);
 
-Doubly_linked_list_t* ListInit(size_t capacity) {
+    if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index < 0) || (index > dl_list->capacity)) {
+        List_data_t incorrect_data = {POISON, INCORRECT_INDEX, INCORRECT_INDEX};
+
+        return incorrect_data;
+    }
+
+    return dl_list->data[index];
+}
+
+
+Doubly_linked_list_t* ListInit(ssize_t capacity) {
     Doubly_linked_list_t* dl_list = (Doubly_linked_list_t*)malloc(sizeof(Doubly_linked_list_t));
     if (dl_list == NULL) {
         PrintErrorMessage("Failed to allocate memory", dl_list);
@@ -238,13 +275,13 @@ Doubly_linked_list_t* ListInit(size_t capacity) {
 }
 
 
-List_element_t* ListDataInit(size_t capacity) {
+List_data_t* ListDataInit(ssize_t capacity) {
     if (capacity <= 0) {
         PrintErrorMessage("Incorrect value, it must be greater than 0", capacity);
         return NULL;
     }
 
-    List_element_t* data = (List_element_t*)calloc(capacity + 1, sizeof(List_element_t)); // +1 because of 0 element
+    List_data_t* data = (List_data_t*)calloc(capacity + 1, sizeof(List_data_t)); // +1 because of 0 element
     if (data == NULL) {
         PrintErrorMessage("Failed to allocate memory", data);
         return NULL;
@@ -279,21 +316,28 @@ void ListDestroy(Doubly_linked_list_t* dl_list) {
 List_report_t ListAddHead(Doubly_linked_list_t* dl_list, List_type_t value) {
     assert(dl_list != NULL);
 
-    return ListAddIndex(dl_list, HEAD_INDEX, value);
+    return ListAddAfterIndex(dl_list, HEAD_INDEX, value);
 }
 
 
 List_report_t ListAddTail(Doubly_linked_list_t* dl_list, List_type_t value) {
     assert(dl_list != NULL);
 
-    return ListAddIndex(dl_list, 0, value);
+    return ListAddAfterIndex(dl_list, 0, value);
 }
 
 
-List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_type_t value) {
+List_report_t ListAddBeforeIndex(Doubly_linked_list_t* dl_list, ssize_t index, List_type_t value) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    return ListAddAfterIndex(dl_list, dl_list->data[index].prev_index, value);
+}
+
+
+List_report_t ListAddAfterIndex(Doubly_linked_list_t* dl_list, ssize_t index, List_type_t value) { // REVIEW before ne zabud proverki na granitsi
+    assert(dl_list != NULL);
+
+    if (LIST_VERIFY(dl_list, LOUD) != LIST_NORMAL)
         return dl_list->last_function_success = FATAL_ERROR;
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index < 0) || (index > dl_list->capacity)) {
@@ -302,7 +346,7 @@ List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_typ
         return dl_list->last_function_success = INCORRECT_INPUT;
     }
 
-    size_t new_index = GetFreeIndex(dl_list);
+    ssize_t new_index = ListGetFreeIndex(dl_list);
     if (dl_list->last_function_success != SUCCESS)
         return dl_list->last_function_success;
 
@@ -313,7 +357,7 @@ List_report_t ListAddIndex(Doubly_linked_list_t* dl_list, size_t index, List_typ
     dl_list->data[dl_list->data[index].next_index].prev_index = new_index;
     dl_list->data[index].next_index = new_index;
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    if (LIST_VERIFY(dl_list, LOUD) != LIST_NORMAL)
         return dl_list->last_function_success = FATAL_ERROR;
 
     return dl_list->last_function_success = SUCCESS;
@@ -334,10 +378,10 @@ List_report_t ListDelTail(Doubly_linked_list_t* dl_list) {
 }
 
 
-List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, size_t index) {
+List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, ssize_t index) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    if (LIST_VERIFY(dl_list, LOUD) != LIST_NORMAL)
         return dl_list->last_function_success = FATAL_ERROR;
 
     if (dl_list->size == 0) {
@@ -354,20 +398,20 @@ List_report_t ListDelIndex(Doubly_linked_list_t* dl_list, size_t index) {
     dl_list->data[dl_list->data[index].next_index].prev_index = dl_list->data[index].prev_index;
     dl_list->data[dl_list->data[index].prev_index].next_index = dl_list->data[index].next_index;
 
-    if (PutFreeIndex(dl_list, index) != SUCCESS)
+    if (ListPutFreeIndex(dl_list, index) != SUCCESS)
         return dl_list->last_function_success;
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    if (LIST_VERIFY(dl_list, LOUD) != LIST_NORMAL)
         return dl_list->last_function_success = FATAL_ERROR;
 
     return dl_list->last_function_success = SUCCESS;
 }
 
 
-size_t GetFreeIndex(Doubly_linked_list_t* dl_list) {
+ssize_t ListGetFreeIndex(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL) {
+    if ((LIST_VERIFY(dl_list, QUIET) & !LIST_LINK_ERROR) != LIST_NORMAL) {
         dl_list->last_function_success = FATAL_ERROR;
         return INCORRECT_INDEX;
     }
@@ -378,13 +422,13 @@ size_t GetFreeIndex(Doubly_linked_list_t* dl_list) {
         return INCORRECT_INDEX;
     }
 
-    size_t free_index = dl_list->free_index;
+    ssize_t free_index = dl_list->free_index;
 
     dl_list->free_index = dl_list->data[dl_list->free_index].next_index;
 
     dl_list->size++;
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL) {
+    if ((LIST_VERIFY(dl_list, QUIET) & !LIST_LINK_ERROR) != LIST_NORMAL) {
         dl_list->last_function_success = FATAL_ERROR;
         return INCORRECT_INDEX;
     }
@@ -395,11 +439,12 @@ size_t GetFreeIndex(Doubly_linked_list_t* dl_list) {
 }
 
 
-List_report_t PutFreeIndex(Doubly_linked_list_t* dl_list, size_t index) {
+List_report_t ListPutFreeIndex(Doubly_linked_list_t* dl_list, ssize_t index) {
     assert(dl_list != NULL);
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    if ((LIST_VERIFY(dl_list, QUIET) & !LIST_LINK_ERROR) != LIST_NORMAL) {
         return dl_list->last_function_success = FATAL_ERROR;
+    }
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index <= 0) || (index > dl_list->capacity)) {
         printf("note from %s(), line %d: index %ld is out of range or not owned by list, %s was cancelled\n",
@@ -415,28 +460,42 @@ List_report_t PutFreeIndex(Doubly_linked_list_t* dl_list, size_t index) {
 
     dl_list->size--;
 
-    if (LIST_VERIFY(dl_list) != LIST_NORMAL)
+    if ((LIST_VERIFY(dl_list, QUIET) & !LIST_LINK_ERROR) != LIST_NORMAL) {
         return dl_list->last_function_success = FATAL_ERROR;
+    }
 
     return dl_list->last_function_success = SUCCESS;
 }
 
 
-List_err_t ListVerify(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line) { // FIXME obhod na cicli
-    assert(dl_list != NULL); assert(calling_function_name != NULL); // konechnost spiska
+List_err_t ListVerify(Doubly_linked_list_t* dl_list, Volume_t volume,
+                      const char* calling_function_name, int from_line) {
+    assert(dl_list != NULL); assert(calling_function_name != NULL);
     ONDEB(assert(List_log_file != NULL);)
 
-    (void)ListDiagnoseError(dl_list, calling_function_name, from_line);
+    (void)ListDiagnoseError(dl_list, volume, calling_function_name, from_line);
 
-    ONDEB(ListGraphicDump(dl_list);)
+    ONDEB(
+        if (volume == LOUD) {
+            char message[MAX_MESSAGE_SIZE];
+            sprintf(message, "Diagnostic from %s(), line %d", calling_function_name, from_line);
+
+            ListGraphicDump(dl_list, message);
+        }
+    )
 
     return dl_list->error;
 }
 
 
-List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_function_name, int from_line) {
+List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, Volume_t volume,
+                             const char* calling_function_name, int from_line) {
     assert(dl_list != NULL); assert(calling_function_name != NULL);
-    ONDEB(assert(List_log_file != NULL);)
+
+    ONDEB(
+        if (List_log_file == NULL)
+            List_log_file = stdout;
+    )
 
     dl_list->error = LIST_NORMAL;
 
@@ -477,6 +536,13 @@ List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_
         dl_list->error = (List_err_t)(dl_list->error | LIST_FREE_INDEX_ERROR);
     }
 
+    if (volume == LOUD) {
+        if (ListCheckCycleError(dl_list) == LIST_LINK_ERROR) {
+            ONDEB(fprintf(List_log_file, "Diagnostic from %s(), line %d: Warning - list contains cycle\n", calling_function_name, from_line);)
+            dl_list->error = (List_err_t)(dl_list->error | LIST_LINK_ERROR);
+        }
+    }
+
     if (dl_list->error == LIST_NORMAL) {
         ONDEB(fprintf(List_log_file, "Diagnostic from %s(), line %d: No fatal damage\n", calling_function_name, from_line);)
     }
@@ -485,8 +551,23 @@ List_err_t ListDiagnoseError(Doubly_linked_list_t* dl_list, const char* calling_
 }
 
 
-void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) { // FIXME krasnie strelochki esli cto-to ne tak
-    assert(dl_list != NULL); assert(message != NULL);
+List_err_t ListCheckCycleError(Doubly_linked_list_t* dl_list) { // REVIEW cycles
+    assert(dl_list != NULL);
+
+    ssize_t index = TAIL_INDEX;
+    ssize_t node_number = 0;
+    for (; (index != 0) && (node_number < dl_list->size);
+         index = dl_list->data[index].next_index, node_number++);
+
+    if ((index == 0) && (node_number == dl_list->size))
+        return LIST_NORMAL;
+    else
+        return LIST_LINK_ERROR;
+}
+
+
+void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) {
+    assert(dl_list != NULL);
 
     if (List_html_log_file == NULL) {
         printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
@@ -497,7 +578,10 @@ void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) { // FI
     if (dl_list->graphic_dump_number == 1)
         ListStartLogging(dl_list);
 
-    fprintf(List_html_log_file, "<h2>%s</h2>\n\n", message);
+    if (message == NULL)
+        fprintf(List_html_log_file, "<h2>dump%d</h2>\n\n", dl_list->graphic_dump_number);
+    else
+        fprintf(List_html_log_file, "<h2>%s</h2>\n\n", message);
 
     ListCreateInformationTable(dl_list);
 
@@ -520,6 +604,11 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
         return;
     }
 
+    char command[MAX_COMMAND_SIZE] = {};
+    sprintf(command, "del /Q %s\\\\*.png", LIST_DUMP_FOLDER_NAME);
+
+    system(command);
+
     fprintf(List_html_log_file,
         "<meta charset=\"UTF-8\">\n\n"
         "<style>\n"
@@ -540,7 +629,7 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
 }
 
 
-void ListCreateInformationTable(Doubly_linked_list_t* dl_list) {
+void ListCreateInformationTable(Doubly_linked_list_t* dl_list) { // REVIEW print error
     assert(dl_list != NULL);
 
     if (List_html_log_file == NULL) {
@@ -556,10 +645,42 @@ void ListCreateInformationTable(Doubly_linked_list_t* dl_list) {
         "\t<tr><td>capacity</td><td>%ld</td></tr>\n"
         "\t<tr><td>head index</td><td>%ld</td></tr>\n"
         "\t<tr><td>tall index</td><td>%ld</td></tr>\n"
-        "\t<tr><td>free index</td><td>%ld</td></tr>\n"
-        "\t<tr><td>errors</td><td>no errors</td></tr>\n"  // FIXME errors
-        "</table>\n\n",
+        "\t<tr><td>free index</td><td>%ld</td></tr>\n",
         dl_list->size, dl_list->capacity, HEAD_INDEX, TAIL_INDEX, dl_list->free_index);
+
+    fprintf(List_html_log_file, "\t<tr><td>errors</td><td>");
+    ListHtmlPrintErrors(dl_list);
+    fprintf(List_html_log_file, "</td></tr>\n</table>\n\n");
+}
+
+
+#define LIST_HTML_CHECK_ERROR(errors_code, checking_error)  \
+    if (((errors_code) & (checking_error)) != 0) {          \
+        fprintf(List_html_log_file, #checking_error "<br>");\
+    }
+
+void ListHtmlPrintErrors(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
+    }
+
+    if (dl_list->error == LIST_NORMAL) {
+        fprintf(List_html_log_file, "no error");
+        return;
+    }
+
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_DATA_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_CAPACITY_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_SIZE_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_HEAD_INDEX_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_TAIL_INDEX_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_FREE_INDEX_ERROR );
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_ZERO_ERROR);
+    LIST_HTML_CHECK_ERROR(dl_list->error, LIST_LINK_ERROR);
 }
 
 
@@ -572,22 +693,47 @@ void ListCreateDataTable(Doubly_linked_list_t* dl_list) {
         return;
     }
 
-    fprintf(List_html_log_file, "<h3>Data</h3>\n<p style=\"font-size: 16px; font-weight: bold; color: %s; margin: 16px 0;\">\n tail -> ",
-           HEAD_FONT_COLOR);
-    for (size_t index = TAIL_INDEX; index != 0; index = dl_list->data[index].next_index)
-        fprintf(List_html_log_file, LIST_TYPE_SPECIFIER " -> ", dl_list->data[index].value);
-    fprintf(List_html_log_file, "head\n</p>\n");
+    fprintf(List_html_log_file, "<h3>Data</h3>\n");
+
+    ListCreateSubsequence(dl_list);
 
     fprintf(List_html_log_file, "<table class = \"data_table\">\n");
     fprintf(List_html_log_file, "\t<tr><td>index</td><td>value</td><td>prev</td><td>next</td><td>status</td></tr>\n");
-    for (size_t index = 0; index <= dl_list->capacity; index++)
+    for (ssize_t index = 0; index <= dl_list->capacity; index++)
         fprintf(List_html_log_file, "\t<tr><td>%ld</td><td>" LIST_TYPE_SPECIFIER "</td><td>%ld</td><td>%ld</td><td>%s</td></tr>\n",
                 index, dl_list->data[index].value, dl_list->data[index].prev_index, dl_list->data[index].next_index, ListGetStatus(dl_list, index));
     fprintf(List_html_log_file, "</table>\n\n");
 }
 
 
-const char* ListGetStatus(Doubly_linked_list_t* dl_list, size_t index) {
+void ListCreateSubsequence(Doubly_linked_list_t* dl_list) {
+    assert(dl_list != NULL);
+
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+        return;
+    }
+
+    fprintf(List_html_log_file, "<p style=\"font-size: 16px; font-weight: bold; color: %s; margin: 16px 0;\">\ntail -> ",
+                HEAD_FONT_COLOR);
+
+    ssize_t index = 0;
+    for (ssize_t node_number = 0;
+         (dl_list->data[index].next_index != 0) && (node_number < dl_list->size); node_number++) {
+        index = dl_list->data[index].next_index;
+
+        fprintf(List_html_log_file, LIST_TYPE_SPECIFIER " -> ", dl_list->data[index].value);
+    }
+
+    if (index == HEAD_INDEX)
+        fprintf(List_html_log_file, "head");
+
+    fprintf(List_html_log_file, "\n</p>\n");
+}
+
+
+const char* ListGetStatus(Doubly_linked_list_t* dl_list, ssize_t index) {
     assert(dl_list != NULL);
 
     if ((index < 0) || (index > dl_list->capacity)) {
@@ -624,16 +770,17 @@ void ListCreateGraphic(Doubly_linked_list_t* dl_list) {
     sprintf(dump_file_name, "dump%d.png", dl_list->graphic_dump_number);
 
     char command[MAX_COMMAND_SIZE] = {};
-    sprintf(command, "dot -Tpng %s -o %s", LIST_GRAPHVIZ_FILE_NAME, dump_file_name);
+    sprintf(command, "dot -Tpng %s -o %s/%s",
+            LIST_GRAPHVIZ_FILE_NAME, LIST_DUMP_FOLDER_NAME, dump_file_name);
 
     system(command);
 
-    fprintf(List_html_log_file, "<h3>Graphic</h3>\n<img src=\"%s\" alt=\"%s\">\n\n",
-            dump_file_name, dump_file_name);
+    fprintf(List_html_log_file, "<h3>Graphic</h3>\n<img src=\"%s/%s\" alt=\"%s\">\n\n",
+            LIST_DUMP_FOLDER_NAME, dump_file_name, dump_file_name);
 }
 
 
-void ListCreatePng(Doubly_linked_list_t* dl_list) {
+void ListCreatePng(Doubly_linked_list_t* dl_list) { // REVIEW folder for pictures
     assert(dl_list != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -643,7 +790,7 @@ void ListCreatePng(Doubly_linked_list_t* dl_list) {
     }
 
     fprintf(List_graphviz_file, "digraph G {\n\n");
-    fprintf(List_graphviz_file, "bgcolor = \"%s\"\n", BACK_COLOR);
+    fprintf(List_graphviz_file, "bgcolor = \"transparent\"\n");//, BACK_COLOR);
     fprintf(List_graphviz_file, "node [shape = none];\n\n");
 
     ListCreateNodes(dl_list);
@@ -665,7 +812,7 @@ void ListCreateNodes(Doubly_linked_list_t* dl_list) {
         return;
     }
 
-    for (size_t index = 0; index <= dl_list->capacity; index++) {
+    for (ssize_t index = 0; index <= dl_list->capacity; index++) {
         Node_colors_t node_colors = {};
 
         if (index == 0)
@@ -685,17 +832,18 @@ void ListCreateNodes(Doubly_linked_list_t* dl_list) {
     }
 
     fprintf(List_graphviz_file, "{rank = same;");
-    for (size_t index = 0; index <= dl_list->capacity; index++)
+    for (ssize_t index = 0; index <= dl_list->capacity; index++)
         fprintf(List_graphviz_file, "node%ld;%s", index, (index != dl_list->capacity) ? " " : "");
     fprintf(List_graphviz_file, "}\n\n");
 
-    for (size_t index = 0; index < dl_list->capacity; index++)
+    for (ssize_t index = 0; index < dl_list->capacity; index++)
         fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, style = invis];\n", index, index + 1);
     fprintf(List_graphviz_file, "\n");
 }
 
 
-void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const char* fill_color, const char* font_color) {
+void SetNodeColors(Node_colors_t* node_colors,
+                   const char* line_color, const char* fill_color, const char* font_color) {
     assert(node_colors != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -710,7 +858,7 @@ void SetNodeColors(Node_colors_t* node_colors, const char* line_color, const cha
 }
 
 
-void ListCreateNode(Doubly_linked_list_t* dl_list, size_t index, Node_colors_t* node_colors) {
+void ListCreateNode(Doubly_linked_list_t* dl_list, ssize_t index, Node_colors_t* node_colors) {
     assert(dl_list != NULL); assert(node_colors != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -765,7 +913,8 @@ void ListCreateMarkers(Doubly_linked_list_t* dl_list) {
 }
 
 
-void ListCreateMarker(Doubly_linked_list_t* dl_list, size_t marker_index, const char* marker_name, Node_colors_t* node_colors) {
+void ListCreateMarker(Doubly_linked_list_t* dl_list, ssize_t marker_index, const char* marker_name,
+                      Node_colors_t* node_colors) {
     assert(dl_list != NULL); assert(marker_name != NULL); assert(node_colors != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -799,7 +948,7 @@ void ListCreateLinks(Doubly_linked_list_t* dl_list) {
         return;
     }
 
-    for (size_t index = 1; index <= dl_list->capacity; index++) {
+    for (ssize_t index = 1; index <= dl_list->capacity; index++) {
         Node_colors_t node_colors = {};
 
         if (dl_list->data[index].prev_index == INCORRECT_INDEX) {
@@ -811,7 +960,8 @@ void ListCreateLinks(Doubly_linked_list_t* dl_list) {
 }
 
 
-void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* prev_color, const char* next_color) {
+void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* prev_color,
+                    const char* next_color) {  // REVIEW krasnie strelochki esli cto-to ne tak
     assert(dl_list != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -821,15 +971,26 @@ void ListCreateLink(Doubly_linked_list_t* dl_list, size_t index, const char* pre
     }
 
     if (prev_color != NULL) {
-        if (dl_list->data[index].prev_index != 0)
+        if (dl_list->data[index].prev_index != 0) {
+            if (((dl_list->data[index].prev_index * dl_list->data[dl_list->data[index].prev_index].prev_index) < 0) ||
+                (dl_list->data[dl_list->data[index].prev_index].next_index != index))
+                prev_color = BACK_ERROR_COLOR;
+
             fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
                     index, dl_list->data[index].prev_index, prev_color);
+        }
     }
 
     if (next_color != NULL) {
-        if (dl_list->data[index].next_index != 0)
+        if (dl_list->data[index].next_index != 0) {
+            if (((dl_list->data[index].prev_index * dl_list->data[dl_list->data[index].next_index].prev_index) < 0) ||
+                ((dl_list->data[dl_list->data[index].next_index].prev_index != INCORRECT_INDEX) &&
+                 (dl_list->data[dl_list->data[index].next_index].prev_index != index)))
+                next_color = FORWARD_ERROR_COLOR;
+
             fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
                     index, dl_list->data[index].next_index, next_color);
+        }
     }
 
     fprintf(List_graphviz_file, "\n");

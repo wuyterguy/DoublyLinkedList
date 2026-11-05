@@ -1,6 +1,6 @@
 digraph G {
 
-bgcolor = "#34252c"
+bgcolor = "transparent"
 node [shape = none];
 
 node0 [label=<
@@ -9,7 +9,7 @@ node0 [label=<
 	BGCOLOR = "#77606b">
 	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">index = 0</FONT></TD></TR><HR/>
 	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">value = 67</FONT></TD></TR><HR/>
-	<TR><TD><FONT COLOR = "#260a18">prev = 4</FONT></TD><VR/><TD><FONT COLOR = "#260a18">next = 2</FONT></TD></TR>
+	<TR><TD><FONT COLOR = "#260a18">prev = 3</FONT></TD><VR/><TD><FONT COLOR = "#260a18">next = 2</FONT></TD></TR>
 	</TABLE>
 >];
 
@@ -19,7 +19,7 @@ node1 [label=<
 	BGCOLOR = "#94285c">
 	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">index = 1</FONT></TD></TR><HR/>
 	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">value = 6</FONT></TD></TR><HR/>
-	<TR><TD><FONT COLOR = "#260a18">prev = 2</FONT></TD><VR/><TD><FONT COLOR = "#260a18">next = 3</FONT></TD></TR>
+	<TR><TD><FONT COLOR = "#260a18">prev = 2</FONT></TD><VR/><TD><FONT COLOR = "#260a18">next = 7</FONT></TD></TR>
 	</TABLE>
 >];
 
@@ -35,41 +35,151 @@ node2 [label=<
 
 node3 [label=<
 	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
-	COLOR = "#430523"
-	BGCOLOR = "#94285c">
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">index = 3</FONT></TD></TR><HR/>
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#260a18">value = 56</FONT></TD></TR><HR/>
-	<TR><TD><FONT COLOR = "#260a18">prev = 1</FONT></TD><VR/><TD><FONT COLOR = "#260a18">next = 4</FONT></TD></TR>
+	COLOR = "#260a18"
+	BGCOLOR = "#591837">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#ca80a2">index = 3</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#ca80a2">value = 56</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#ca80a2">prev = 1</FONT></TD><VR/><TD><FONT COLOR = "#ca80a2">next = 0</FONT></TD></TR>
 	</TABLE>
 >];
 
 node4 [label=<
 	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
-	COLOR = "#260a18"
-	BGCOLOR = "#591837">
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#ca80a2">index = 4</FONT></TD></TR><HR/>
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#ca80a2">value = 12</FONT></TD></TR><HR/>
-	<TR><TD><FONT COLOR = "#ca80a2">prev = 3</FONT></TD><VR/><TD><FONT COLOR = "#ca80a2">next = 0</FONT></TD></TR>
+	COLOR = "#063a2e"
+	BGCOLOR = "#06a07c">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#0a2920">index = 4</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#0a2920">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#0a2920">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#0a2920">next = 5</FONT></TD></TR>
 	</TABLE>
 >];
 
 node5 [label=<
 	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
-	COLOR = "#063a2e"
-	BGCOLOR = "#06a07c">
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#0a2920">index = 5</FONT></TD></TR><HR/>
-	<TR><TD COLSPAN = "2"><FONT COLOR = "#0a2920">value = 67</FONT></TD></TR><HR/>
-	<TR><TD><FONT COLOR = "#0a2920">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#0a2920">next = 0</FONT></TD></TR>
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 5</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 6</FONT></TD></TR>
 	</TABLE>
 >];
 
-{rank = same;node0; node1; node2; node3; node4; node5;}
+node6 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 6</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 7</FONT></TD></TR>
+	</TABLE>
+>];
+
+node7 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 7</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 8</FONT></TD></TR>
+	</TABLE>
+>];
+
+node8 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 8</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 9</FONT></TD></TR>
+	</TABLE>
+>];
+
+node9 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 9</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 10</FONT></TD></TR>
+	</TABLE>
+>];
+
+node10 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 10</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 11</FONT></TD></TR>
+	</TABLE>
+>];
+
+node11 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 11</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 12</FONT></TD></TR>
+	</TABLE>
+>];
+
+node12 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 12</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 13</FONT></TD></TR>
+	</TABLE>
+>];
+
+node13 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 13</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 14</FONT></TD></TR>
+	</TABLE>
+>];
+
+node14 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 14</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 15</FONT></TD></TR>
+	</TABLE>
+>];
+
+node15 [label=<
+	<TABLE BORDER = "1" CELLBORDER = "0" CELLSPACING = "0" CELLPADDING="4" STYLE = "ROUNDED"
+	COLOR = "#03261e"
+	BGCOLOR = "#037f62">
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">index = 15</FONT></TD></TR><HR/>
+	<TR><TD COLSPAN = "2"><FONT COLOR = "#05120e">value = 67</FONT></TD></TR><HR/>
+	<TR><TD><FONT COLOR = "#05120e">prev = -1</FONT></TD><VR/><TD><FONT COLOR = "#05120e">next = 0</FONT></TD></TR>
+	</TABLE>
+>];
+
+{rank = same;node0; node1; node2; node3; node4; node5; node6; node7; node8; node9; node10; node11; node12; node13; node14; node15;}
 
 node0 -> node1 [dir = forward, style = invis];
 node1 -> node2 [dir = forward, style = invis];
 node2 -> node3 [dir = forward, style = invis];
 node3 -> node4 [dir = forward, style = invis];
 node4 -> node5 [dir = forward, style = invis];
+node5 -> node6 [dir = forward, style = invis];
+node6 -> node7 [dir = forward, style = invis];
+node7 -> node8 [dir = forward, style = invis];
+node8 -> node9 [dir = forward, style = invis];
+node9 -> node10 [dir = forward, style = invis];
+node10 -> node11 [dir = forward, style = invis];
+node11 -> node12 [dir = forward, style = invis];
+node12 -> node13 [dir = forward, style = invis];
+node13 -> node14 [dir = forward, style = invis];
+node14 -> node15 [dir = forward, style = invis];
 
 free [
 	label = "free", shape = box, style = "rounded, filled",
@@ -79,7 +189,7 @@ free [
 	group = "g1"
 ];
 
-free -> node5 [dir = forward, style = invis, penwidth=2, color = "#06a07c"];
+free -> node4 [dir = forward, style = invis, penwidth=2, color = "#06a07c"];
 
 head [
 	label = "head", shape = box, style = "rounded, filled",
@@ -89,7 +199,7 @@ head [
 	group = "g1"
 ];
 
-head -> node4 [dir = forward, style = invis, penwidth=2, color = "#591837"];
+head -> node3 [dir = forward, style = invis, penwidth=2, color = "#591837"];
 
 tail [
 	label = "tail", shape = box, style = "rounded, filled",
@@ -102,14 +212,33 @@ tail [
 tail -> node2 [dir = forward, style = invis, penwidth=2, color = "#ca80a2"];
 
 node1 -> node2 [dir = forward, penwidth=2, color = "#591837", constraint = false];
-node1 -> node3 [dir = forward, penwidth=2, color = "#ca80a2", constraint = false];
+node1 -> node7 [dir = forward, penwidth=2, color = "#e13d3d", constraint = false];
 
 node2 -> node1 [dir = forward, penwidth=2, color = "#ca80a2", constraint = false];
 
-node3 -> node1 [dir = forward, penwidth=2, color = "#591837", constraint = false];
-node3 -> node4 [dir = forward, penwidth=2, color = "#ca80a2", constraint = false];
+node3 -> node1 [dir = forward, penwidth=2, color = "#780b0b", constraint = false];
 
-node4 -> node3 [dir = forward, penwidth=2, color = "#591837", constraint = false];
+node4 -> node5 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node5 -> node6 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node6 -> node7 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node7 -> node8 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node8 -> node9 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node9 -> node10 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node10 -> node11 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node11 -> node12 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node12 -> node13 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node13 -> node14 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
+
+node14 -> node15 [dir = forward, penwidth=2, color = "#06a07c", constraint = false];
 
 
 }
