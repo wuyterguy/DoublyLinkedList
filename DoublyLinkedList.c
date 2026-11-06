@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
+#include <string.h>
 
 #define DEBUG
 
@@ -16,6 +18,9 @@ static FILE* List_graphviz_file = NULL;
 #define LIST_GRAPHVIZ_FILE_NAME "list_graphviz.dot"
 static FILE* List_html_log_file = NULL;
 #define LIST_HTML_LOG_FILE_NAME "list_log.html"
+
+#define DEFAULT_THICKNESS 2
+#define ERROR_THICKNESS   4
 
 #define BACK_COLOR "#34252c"
 
@@ -81,11 +86,14 @@ typedef enum {SUCCESS = 0, FATAL_ERROR = 1, OVERFLOW = -1, VACUUM = -2, INCORREC
 
 typedef enum {QUIET = 0, LOUD = 1} Volume_t;
 
-#define LIST_DUMP_FOLDER_NAME "dump_pictures"
+#define LIST_DUMP_FOLDER_PREFIX "dump"
+#define BACKGROUND_IMAGE_NAME "ArimaKana.png"
 
 #define INCORRECT_INDEX -1
 
 #define MAX_FILE_NAME_SIZE 100
+#define MAX_TIME_SUFFIX_SIZE 100
+#define MAX_FOLDER_NAME_SIZE 100
 #define MAX_MESSAGE_SIZE 200
 #define MAX_COMMAND_SIZE 200
 
@@ -110,6 +118,8 @@ struct Doubly_linked_list_t {
     ssize_t free_index;
 
     int graphic_dump_number;   // REVIEW dump number
+
+    char dump_folder_name[MAX_FOLDER_NAME_SIZE] = {};
 
     List_err_t error;
     List_report_t last_function_success;
@@ -190,7 +200,7 @@ void ListCreateMarker(Doubly_linked_list_t* dl_list, ssize_t marker_index, const
 void ListCreateLinks(Doubly_linked_list_t* dl_list);
 
 void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* prev_color,
-                    const char* next_color);
+                    const char* next_color, float thickness);
 
 
 int main() {
@@ -604,8 +614,19 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
         return;
     }
 
+    time_t current_time = time(NULL);
+    struct tm* local_time = localtime(&current_time);
+
+    char time_suffix[MAX_TIME_SUFFIX_SIZE] = {};
+    strftime(time_suffix, MAX_TIME_SUFFIX_SIZE, "_%H_%M_%S-%d_%m_%Y", local_time);
+
+    char folder_name[MAX_FOLDER_NAME_SIZE] = {};
+    sprintf(folder_name, "%s%s", LIST_DUMP_FOLDER_PREFIX, time_suffix);
+
+    strncpy(dl_list->dump_folder_name, folder_name, MAX_FOLDER_NAME_SIZE);
+
     char command[MAX_COMMAND_SIZE] = {};
-    sprintf(command, "del /Q %s\\\\*.png", LIST_DUMP_FOLDER_NAME);
+    sprintf(command, "mkdir %s 2>nul", dl_list->dump_folder_name);
 
     system(command);
 
@@ -614,7 +635,7 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
         "<style>\n"
         "\tbody {background-color: %s; font-family: sans-serif; margin: 20px;}\n"
         "\tbody::before {content: \"\"; position: fixed; top: 0; left: 0; width: 100%%; height: 100%%; z-index: -1;\n"
-        "\t\t\t\t  background-image: url('ArimaKana.png'); background-repeat: no-repeat;\n"
+        "\t\t\t\t  background-image: url('%s'); background-repeat: no-repeat;\n"
 		"\t\t\t\t  background-size: cover; background-position: right;}\n"
         "\th1 {text-align: center; color: %s;}\n"
         "\th2 {text-align: center; color: %s;font-size: 20px; margin-top: 20px; margin-bottom: 20px;}\n"
@@ -627,7 +648,8 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
         "</style>\n\n"
         "<h1>Log</h1>\n\n"
         "<hr>\n\n",
-        BACK_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_LINE_COLOR,
+        BACK_COLOR, BACKGROUND_IMAGE_NAME,
+        HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_LINE_COLOR,
         NEXT_FILL_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR);
 }
 
@@ -774,12 +796,12 @@ void ListCreateGraphic(Doubly_linked_list_t* dl_list) {
 
     char command[MAX_COMMAND_SIZE] = {};
     sprintf(command, "dot -Tpng %s -o %s/%s",
-            LIST_GRAPHVIZ_FILE_NAME, LIST_DUMP_FOLDER_NAME, dump_file_name);
+            LIST_GRAPHVIZ_FILE_NAME, dl_list->dump_folder_name, dump_file_name);
 
     system(command);
 
     fprintf(List_html_log_file, "<h3>Graphic</h3>\n<img src=\"%s/%s\" alt=\"%s\">\n\n",
-            LIST_DUMP_FOLDER_NAME, dump_file_name, dump_file_name);
+            dl_list->dump_folder_name, dump_file_name, dump_file_name);
 }
 
 
@@ -955,16 +977,16 @@ void ListCreateLinks(Doubly_linked_list_t* dl_list) {
         Node_colors_t node_colors = {};
 
         if (dl_list->data[index].prev_index == INCORRECT_INDEX) {
-            ListCreateLink(dl_list, index, NULL, NEXT_FILL_COLOR);
+            ListCreateLink(dl_list, index, NULL, NEXT_FILL_COLOR, DEFAULT_THICKNESS);
         }
         else
-            ListCreateLink(dl_list, index, HEAD_FILL_COLOR, TAIL_FILL_COLOR);
+            ListCreateLink(dl_list, index, HEAD_FILL_COLOR, TAIL_FILL_COLOR, DEFAULT_THICKNESS);
     }
 }
 
 
 void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* prev_color,
-                    const char* next_color) {  // REVIEW krasnie strelochki esli cto-to ne tak
+                    const char* next_color, float thickness) {  // REVIEW krasnie strelochki esli cto-to ne tak
     assert(dl_list != NULL);
 
     if (List_graphviz_file == NULL) {
@@ -976,11 +998,13 @@ void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* pr
     if (prev_color != NULL) {
         if (dl_list->data[index].prev_index != 0) {
             if (((dl_list->data[index].prev_index * dl_list->data[dl_list->data[index].prev_index].prev_index) < 0) ||
-                (dl_list->data[dl_list->data[index].prev_index].next_index != index))
+                (dl_list->data[dl_list->data[index].prev_index].next_index != index)) {
                 prev_color = BACK_ERROR_COLOR;
+                thickness = ERROR_THICKNESS;
+            }
 
-            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
-                    index, dl_list->data[index].prev_index, prev_color);
+            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth = %f, color = \"%s\", constraint = false];\n",
+                    index, dl_list->data[index].prev_index, thickness, prev_color);
         }
     }
 
@@ -988,11 +1012,13 @@ void ListCreateLink(Doubly_linked_list_t* dl_list, ssize_t index, const char* pr
         if (dl_list->data[index].next_index != 0) {
             if (((dl_list->data[index].prev_index * dl_list->data[dl_list->data[index].next_index].prev_index) < 0) ||
                 ((dl_list->data[dl_list->data[index].next_index].prev_index != INCORRECT_INDEX) &&
-                 (dl_list->data[dl_list->data[index].next_index].prev_index != index)))
+                 (dl_list->data[dl_list->data[index].next_index].prev_index != index))) {
                 next_color = FORWARD_ERROR_COLOR;
+                thickness = ERROR_THICKNESS;
+            }
 
-            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth=2, color = \"%s\", constraint = false];\n",
-                    index, dl_list->data[index].next_index, next_color);
+            fprintf(List_graphviz_file, "node%ld -> node%ld [dir = forward, penwidth = %f, color = \"%s\", constraint = false];\n",
+                    index, dl_list->data[index].next_index, thickness, next_color);
         }
     }
 

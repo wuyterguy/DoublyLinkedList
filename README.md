@@ -1,4 +1,4 @@
-<<h2 align="center"> Stack </h2>
+<<h2 align="center"> List </h2>
 
 ---
 
@@ -19,7 +19,11 @@
 
 #### overview
 
-This library contains basic functions for work with stack. Among the functions designed for direct invocation by the user: ___StackInit___, ___StackDestroy___, ___StackPush___, ___StackPop___, ___StackVerify___, ___StackDiagnoseError___, ___StackDump___. Functions that modify the stack control error. ___StackPush___ and ___StackPop___ return one of the following values characterizing the success of execution: ___SUCCESS___, ___FATAL_ERROR___, special value ___OVERFLOW___ or ___VACUUM___ depending on function. Value ___FATAL_ERROR___ is returned when ___StackVerify___ detects fatal violations in the stack structure that prevent stack operations. you can determine the exact error by checking the ___.error___ field of stack structure after receiving a ___FATAL_ERROR___. Value ___OVERFLOW___ means that it is impossible to expand the stack capacity, in that case the ___StackPush___ operation not be performed. Value ___VACUUM___ means that stack is empty, in that case the ___StackPop___ operation not be performed. ___SUCCESS___ mean that indicates the successful execution of a stack operation.
+This library contains basic functions for work with doubly linked list. Among the functions designed for direct invocation by the user:
+ ___ListInit___, ___ListDestroy___, ___ListAddHead___, ___ListAddTail___, ___ListAddAfterIndex___, ___ListAddBeforeIndex___, ___ListDelHead___, ___ListDelTail___, ___ListDelIndex___, ___ListVerify___, ___ListDiagnoseError___, ___ListDump___.
+Functions that modify the list control error:
+ ___ListAddHead___, ___ListAddTail___, ___ListAddAfterIndex___, ___ListAddBeforeIndex___, ___ListDelHead___, ___ListDelTail___, ___ListDelIndex___
+ -return one of the following values characterizing the success of execution: ___SUCCESS___, ___FATAL_ERROR___, special value ___OVERFLOW___ or ___VACUUM___ depending on function. Value ___FATAL_ERROR___ is returned when ___ListVerify___ detects fatal violations in the list structure that prevent list operations. you can determine the exact error by checking the ___.error___ field of list structure after receiving a ___FATAL_ERROR___. Value ___OVERFLOW___ means that list is filled, in that case the ___ListAdd...___ operation not be performed. Value ___VACUUM___ means that list is empty, in that case the ___ListDel...___ operation not be performed. ___SUCCESS___ mean that indicates the successful execution of a list operation.
 
 ---
 
@@ -27,9 +31,10 @@ This library contains basic functions for work with stack. Among the functions d
 
 #### features
 
-* The program have debug mode for printing reports of function verify to file
-* The program have canary protect mode in which canaries are created an their integrity is monitored.
-* The program have hash protect mode in which hash is calculated and its immutability is monitored.
+* All operations on the list are performed in O(const) time.
+* All the contents of the list are contained in an indexed array called ___data___.
+* The program have debug mode for printing reports of function verify to log file
+* The program have graphical dump in html page format.
 
 ---
 
@@ -37,9 +42,9 @@ This library contains basic functions for work with stack. Among the functions d
 
 #### demonstration
 
-* __the canary and hash protection triggered in debug mode__
+* __graphic dump shows incorrect links__
 
-![protection_triggered.png](protection_triggered.png)
+![dump_demonstration.png](dump_demonstration.png)
 
 ---
 
@@ -48,12 +53,11 @@ This library contains basic functions for work with stack. Among the functions d
 #### option management
 
 __launch__
-User has to include ___Stack.c___ to your program on __C__ language.
+User has to include ___List.c___ to his program on __C__ language.
 
 __program options__
 * define macro ___DEBUG___ before including to switch on debug mode.
-* define macro ___CANARY_PROTECTION___ before including to switch on canary protection mode.
-* define macro ___CANARY_PROTECTION___ before including to switch on canary protection mode.
+* Set ___LIST_DUMP_FOLDER_PREFIX___, ___LIST_LOG_FILE_NAME___, ___LIST_GRAPHVIZ_FILE_NAME___, ___LIST_HTML_LOG_FILE_NAME___ to customize ___DEBUG___ output.
 
 ---
 
@@ -68,10 +72,12 @@ The following __C/C++__ libraries were used in the program
 for basic functions (_printf_, _fopen_, etc.)
 * __stdlib.h__
 for basic functions (_realloc_)
-* __math.h__
-for mathematical operations (_pow_)
 * __assert.h__
 for debug (_assert_)
+* __time.h__
+for dump folder naming (_strftime_, etc.)
+* __string.h__
+foe string functions (__strncpy__)
 
 ----
 
@@ -79,6 +85,7 @@ for debug (_assert_)
 
 #### to do
 
-* Checks for dynamic memory pointers based on heap management functions.
+* insert function based on element number but not element index.
+* functions for accessing the value of a list element
 
 </span>
