@@ -32,12 +32,12 @@ static FILE* List_html_log_file = NULL;
 #define ZERO_FONT_COLOR "#260a18"
 
 #define DATA_LINE_COLOR "#430523"
-#define DATA_FILL_COLOR "#94285c"
-#define DATA_FONT_COLOR "#260a18"
+#define DATA_FILL_COLOR "#94285c" //"#9534a3"
+#define DATA_FONT_COLOR "#260a18" //"#ffffc0"
 
 #define HEAD_LINE_COLOR "#260a18"
 #define HEAD_FILL_COLOR "#591837"
-#define HEAD_FONT_COLOR "#ca80a2"
+#define HEAD_FONT_COLOR "#ca80a2" //"#c0ffff"
 
 #define TAIL_LINE_COLOR "#430523"
 #define TAIL_FILL_COLOR "#ca80a2"
@@ -59,6 +59,8 @@ typedef enum {LIST_NORMAL           = 0b00000000, LIST_DATA_ERROR       = 0b0000
               LIST_FREE_INDEX_ERROR = 0b00100000, LIST_ZERO_ERROR       = 0b01000000,
               LIST_LINK_ERROR       = 0b10000000}                                             List_err_t;
 typedef enum {SUCCESS = 0, FATAL_ERROR = 1, OVERFLOW = -1, VACUUM = -2, INCORRECT_INPUT = -3} List_report_t;
+typedef enum {START_LOG_NORMAL = 0, START_LOG_OPEN_ERROR = 1}                                 Start_log_err_t;
+
 
 #define LIST_TYPE INT
 
@@ -169,7 +171,7 @@ List_err_t ListCheckCycleError(Doubly_linked_list_t* dl_list);
 
 void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message);
 
-void ListStartLogging(Doubly_linked_list_t* dl_list);
+Start_log_err_t ListStartLogging(Doubly_linked_list_t* dl_list);
 
 void ListCreateInformationTable(Doubly_linked_list_t* dl_list);
 
@@ -211,11 +213,7 @@ int main() {
             return 1;
         }
     )
-    List_html_log_file = fopen(LIST_HTML_LOG_FILE_NAME, "w");
-    if (List_html_log_file == NULL) {
-        printf("Cant open %s with \"w\" permission\n", LIST_GRAPHVIZ_FILE_NAME);
-        return 1;
-    }
+
 
     Doubly_linked_list_t* dllst_1 = ListInit(15);
 
@@ -580,14 +578,17 @@ List_err_t ListCheckCycleError(Doubly_linked_list_t* dl_list) { // REVIEW cycles
 void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) {
     assert(dl_list != NULL);
 
-    if (List_html_log_file == NULL) {
-        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
-               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
-        return;
+    if (dl_list->graphic_dump_number == 1) {
+        if (ListStartLogging(dl_list) != START_LOG_NORMAL)
+            return;
     }
-
-    if (dl_list->graphic_dump_number == 1)
-        ListStartLogging(dl_list);
+    else {
+        if (List_html_log_file == NULL) {
+            printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
+                   __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
+            return;
+        }
+    }
 
     if (message == NULL)
         fprintf(List_html_log_file, "<h2>dump%d</h2>\n\n", dl_list->graphic_dump_number);
@@ -606,14 +607,8 @@ void ListGraphicDump(Doubly_linked_list_t* dl_list, const char* message) {
 }
 
 
-void ListStartLogging(Doubly_linked_list_t* dl_list) {
+Start_log_err_t ListStartLogging(Doubly_linked_list_t* dl_list) {
     assert(dl_list != NULL);
-
-    if (List_html_log_file == NULL) {
-        printf("note from %s(), line %d: %s isn't open, %s was cancelled\n",
-               __func__, __LINE__, LIST_HTML_LOG_FILE_NAME, __func__);
-        return;
-    }
 
     time_t current_time = time(NULL);
     struct tm* local_time = localtime(&current_time);
@@ -627,9 +622,19 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
     strncpy(dl_list->dump_folder_name, folder_name, MAX_FOLDER_NAME_SIZE);
 
     char command[MAX_COMMAND_SIZE] = {};
-    sprintf(command, "mkdir %s 2>nul", dl_list->dump_folder_name);
+    sprintf(command, "mkdir %s 2>nul", folder_name);
 
     system(command);
+
+    char html_log_file_path[MAX_FILE_NAME_SIZE] = {};
+    sprintf(html_log_file_path, "%s/%s", folder_name, LIST_HTML_LOG_FILE_NAME);
+
+    List_html_log_file = fopen(html_log_file_path, "w");
+    if (List_html_log_file == NULL) {
+        printf("note from %s(), line %d: can't open %s/%s, %s was cancelled\n",
+               __func__, __LINE__, folder_name, LIST_HTML_LOG_FILE_NAME, __func__);
+        return START_LOG_OPEN_ERROR;
+    }
 
     fprintf(List_html_log_file,
         "<meta charset=\"UTF-8\">\n\n"
@@ -652,6 +657,8 @@ void ListStartLogging(Doubly_linked_list_t* dl_list) {
         BACK_COLOR, BACKGROUND_IMAGE_NAME,
         HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_FONT_COLOR, HEAD_LINE_COLOR,
         NEXT_FILL_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR, HEAD_FILL_COLOR, HEAD_FONT_COLOR);
+
+    return START_LOG_NORMAL;
 }
 
 
