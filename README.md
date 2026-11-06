@@ -20,7 +20,7 @@
 #### overview
 
 This library contains basic functions for work with doubly linked list. Among the functions designed for direct invocation by the user:
- ___ListInit___, ___ListDestroy___, ___ListAddHead___, ___ListAddTail___, ___ListAddAfterIndex___, ___ListAddBeforeIndex___, ___ListDelHead___, ___ListDelTail___, ___ListDelIndex___, ___ListVerify___, ___ListDiagnoseError___, ___ListDump___.
+ ___ListGetValue___, ___ListInit___, ___ListDestroy___, ___ListAddHead___, ___ListAddTail___, ___ListAddAfterIndex___, ___ListAddBeforeIndex___, ___ListDelHead___, ___ListDelTail___, ___ListDelIndex___, ___ListVerify___, ___ListDiagnoseError___, ___ListDump___.
 Functions that modify the list control error:
  ___ListAddHead___, ___ListAddTail___, ___ListAddAfterIndex___, ___ListAddBeforeIndex___, ___ListDelHead___, ___ListDelTail___, ___ListDelIndex___
  -return one of the following values characterizing the success of execution: ___SUCCESS___, ___FATAL_ERROR___, special value ___OVERFLOW___ or ___VACUUM___ depending on function. Value ___FATAL_ERROR___ is returned when ___ListVerify___ detects fatal violations in the list structure that prevent list operations. you can determine the exact error by checking the ___.error___ field of list structure after receiving a ___FATAL_ERROR___. Value ___OVERFLOW___ means that list is filled, in that case the ___ListAdd...___ operation not be performed. Value ___VACUUM___ means that list is empty, in that case the ___ListDel...___ operation not be performed. ___SUCCESS___ mean that indicates the successful execution of a list operation.

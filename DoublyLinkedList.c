@@ -133,7 +133,7 @@ struct Doubly_linked_list_t {
 
 #define LIST_VERIFY(dl_list, volume) ListVerify(dl_list, volume, __func__, __LINE__)
 
-List_data_t ListData(Doubly_linked_list_t* dl_list, ssize_t index); // STUB func obrasheniya po indexu
+List_type_t ListGetValue(Doubly_linked_list_t* dl_list, ssize_t index); // STUB func obrasheniya po indexu
 
 Doubly_linked_list_t* ListInit(ssize_t capacity);
 
@@ -245,16 +245,17 @@ int main() {
 }
 
 
-List_data_t ListData(Doubly_linked_list_t* dl_list, ssize_t index) {
+List_type_t ListGetValue(Doubly_linked_list_t* dl_list, ssize_t index) {
     assert(dl_list != NULL);
 
     if ((dl_list->data[index].prev_index == INCORRECT_INDEX) || (index < 0) || (index > dl_list->capacity)) {
         List_data_t incorrect_data = {POISON, INCORRECT_INDEX, INCORRECT_INDEX};
-
-        return incorrect_data;
+        printf("note from %s(), line %d: index %ld is out of range or not owned by list, %s was cancelled\n",
+               __func__, __LINE__, index, __func__);
+        return POISON;
     }
 
-    return dl_list->data[index];
+    return dl_list->data[index].value;
 }
 
 
